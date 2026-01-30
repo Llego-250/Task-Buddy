@@ -43,11 +43,10 @@ body {
 }
 .card{
   width: 350px;
-      background: #ffffff;
+      background: linear-gradient(rgb(20, 209, 211),rgb(14, 10, 111));
       border-radius: 20px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
       padding: 12rem;
-      box-shadow:#242424;
 }
 #app {
   max-width: 1280px;
