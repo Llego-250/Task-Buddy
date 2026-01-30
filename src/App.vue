@@ -43,7 +43,7 @@ body {
 }
 .card{
   width: 350px;
-      background: linear-gradient(rgb(20, 209, 211),rgb(14, 10, 111));
+      background: linear-gradient(rgb(20, 209, 211), rgba(82, 108, 96, 0.299),rgb(14, 10, 111));
       border-radius: 20px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
       padding: 12rem;
