@@ -1,16 +1,16 @@
 <template>
-<div class="min-h-screen bg-gradient-to-br from-blue-900 to-cyan-400 p-5">
-  <div class="text-center mb-8">
-    <h1 class="text-white text-4xl font-bold mb-4">TaskBuddy</h1>
-    <h2 class="text-white text-xl mx-10 mb-8">Hello Beautiful User❤️, this is the personal task manager</h2>
+<div class="main-container">
+  <div class="header">
+    <h1 class="title">TaskBuddy</h1>
+    <h2 class="subtitle">Hello Beautiful User❤️, this is the personal task manager</h2>
     
-    <div class="mb-8">
+    <div class="input-section">
       <input type="text" name="New task" placeholder="new task">
       <button>ADD</button>
     </div>
   </div>
 
-  <div class="flex justify-center items-center min-h-[60vh]">
+  <div class="card-container">
     <div class="card">
       <div class="card-title">Tasks</div>
       <div class="task">
@@ -40,12 +40,36 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  font-family: Arial, sans-serif;
-  margin: 0px;
-  background: linear-gradient(rgb(14, 10, 111), rgb(20, 209, 211));
-  min-width: 320px;
+.main-container {
   min-height: 100vh;
+  background: linear-gradient(135deg, rgb(30, 58, 138), rgb(6, 182, 212));
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.title {
+  color: white;
+  font-size: 2.25rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+.subtitle {
+  color: white;
+  font-size: 1.25rem;
+  margin: 0 2.5rem 2rem;
+}
+.input-section {
+  margin-bottom: 2rem;
+}
+.card-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .card{
   width: 400px;
