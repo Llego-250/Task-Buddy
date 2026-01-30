@@ -1,21 +1,27 @@
 <template>
 <div class="min-h-screen bg-gradient-to-br from-blue-900 to-cyan-400 p-5">
-  <div class="text-center">
+  <div class="text-center mb-8">
     <h1 class="text-white text-4xl font-bold mb-4">TaskBuddy</h1>
     <h2 class="text-white text-xl mx-10 mb-8">Hello Beautiful User❤️, this is the personal task manager</h2>
+    
+    <div class="mb-8">
+      <input type="text" name="New task" placeholder="new task">
+      <button>ADD</button>
+    </div>
   </div>
 
-  <div>
-    <input type="text" name="New task" placeholder="new task">
-    <button>ADD</button>
+  <div class="flex justify-center">
+    <div class="card">
+      <div class="card-title">Tasks</div>
+      <div class="task">
+        <div class="task-item">Working on final project</div>
+        <div class="task-item">Study for exam</div>
+        <div class="task-item">Complete Vue.js tutorial</div>
+        <div class="task-item">Review code documentation</div>
+      </div>
+    </div>
   </div>
 </div>
-<div class="card">
-    <div class="card-title">Task</div>
-    <div class="task">
-    <div class="Work">Working on final project</div>
-</div>
-  </div>
 </template>
 
 <style>
@@ -38,33 +44,37 @@ body {
   font-family: Arial, sans-serif;
   margin: 0px;
   background: linear-gradient(rgb(14, 10, 111), rgb(20, 209, 211));
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
-
 }
 .card{
-  width: 350px;
-      background: linear-gradient(rgb(20, 209, 211), rgba(82, 108, 96, 0.299),rgb(14, 10, 111));
-      border-radius: 20px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-      padding: 11.5rem;
+  width: 400px;
+  background: linear-gradient(rgb(20, 209, 211), rgba(82, 108, 96, 0.299),rgb(14, 10, 111));
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
 }
 .card-title{
   font-size: 2.1em;
   font-weight: bold;
-  margin-top:-5.5em;
-  right:18em;
+  margin-bottom: 1rem;
+  text-align: center;
 }
 .task{
-  width: 350px;
+  width: 100%;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 20px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  padding: 2rem;
+  padding: 1.5rem;
+}
+.task-item{
+  padding: 0.8rem;
+  margin: 0.5rem 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 #app {
   max-width: 1280px;
