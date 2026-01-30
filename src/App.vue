@@ -40,7 +40,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.main-container {
+body {
+  font-family: Arial, sans-serif;
+  margin: 0px;
+  background: linear-gradient(rgb(14, 10, 111), rgb(20, 209, 211));
+  min-width: 320px;
   min-height: 100vh;
   background: linear-gradient(135deg, rgb(30, 58, 138), rgb(6, 182, 212));
   padding: 1.25rem;
@@ -76,7 +80,7 @@
   background: linear-gradient(rgb(20, 209, 211), rgba(82, 108, 96, 0.299),rgb(14, 10, 111));
   border-radius: 20px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
+  padding: 3rem;
 }
 .card-title{
   font-size: 2.1em;
@@ -85,7 +89,7 @@
   text-align: center;
 }
 .task{
-  width: 100%;
+  width: 90%;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
   border: 2px solid rgba(255, 255, 255, 0.3);
