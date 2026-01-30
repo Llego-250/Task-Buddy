@@ -5,11 +5,14 @@
     <h2 class="text-white text-xl mx-10 mb-8">Hello Beautiful User❤️, this is the personal task manager</h2>
   </div>
 
-  <div class="flex gap-2 mb-4">
-    <input type="text" name="New task" placeholder="new task" class="px-3 py-2 border border-gray-300 rounded-md flex-1">
-    <button class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors cursor-pointer">ADD</button>
+  <div>
+    <input type="text" name="New task" placeholder="new task">
+    <button>ADD</button>
   </div>
 </div>
+<div class="card">
+    <div class="card-title"></div>
+  </div>
 </template>
 
 <style>
@@ -37,6 +40,14 @@ body {
   min-width: 320px;
   min-height: 100vh;
 
+}
+.card{
+  width: 350px;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      padding: 12rem;
+      box-shadow:#242424;
 }
 #app {
   max-width: 1280px;
