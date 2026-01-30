@@ -10,7 +10,7 @@
     </div>
   </div>
 
-  <div class="flex justify-center">
+  <div class="flex justify-center items-center min-h-[60vh]">
     <div class="card">
       <div class="card-title">Tasks</div>
       <div class="task">
