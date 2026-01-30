@@ -12,6 +12,9 @@
 </div>
 <div class="card">
     <div class="card-title">Task</div>
+    <div class="task">
+    <div class="Work">Working on final project</div>
+</div>
   </div>
 </template>
 
@@ -51,9 +54,17 @@ body {
 .card-title{
   font-size: 2.1em;
   font-weight: bold;
-  position: fixed;
   margin-top:-5.5em;
   right:18em;
+}
+.task{
+  width: 350px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  padding: 2rem;
 }
 #app {
   max-width: 1280px;
