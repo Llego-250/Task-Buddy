@@ -405,23 +405,50 @@ h2{
 }
 
 input {
-  padding: 8px;
-  margin: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 12px 16px;
+  margin: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  color: white;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+input:focus {
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
 }
 
 button {
-  padding: 8px 16px;
-  background-color: #469cf8;
+  padding: 12px 20px;
+  margin: 8px;
+  background: linear-gradient(135deg, #469cf8, #0056b3);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 12px;
   cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(70, 156, 248, 0.3);
 }
 
 button:hover {
-  background-color: #0056b3;
+  background: linear-gradient(135deg, #0056b3, #003d82);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(70, 156, 248, 0.4);
+}
+
+button:active {
+  transform: translateY(0);
 }
 
 .view-more-btn {
@@ -441,12 +468,21 @@ button:hover {
 }
 
 .date-input {
-  margin: 5px;
+  margin: 8px;
+  color-scheme: dark;
 }
 
 .calendar-btn {
-  font-size: 1.2em;
-  margin-left: 10px;
+  font-size: 1.4em;
+  margin-left: 12px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+.calendar-btn:hover {
+  background: linear-gradient(135deg, #d97706, #b45309);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
 }
 
 .calendar-overlay {
