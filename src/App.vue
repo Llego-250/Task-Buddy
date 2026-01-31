@@ -11,6 +11,15 @@
   </div>
 
   <div class="card-container">
+    <div class="card completed">
+      <div class="card-title">Completed Tasks</div>
+      <div class="task">
+        <div class="task-item completed-item">Setup project structure</div>
+        <div class="task-item completed-item">Design UI mockups</div>
+        <div class="task-item completed-item">Install dependencies</div>
+      </div>
+    </div>
+
     <div class="card">
       <div class="card-title">Tasks</div>
       <div class="task">
@@ -18,6 +27,15 @@
         <div class="task-item">Study for exam</div>
         <div class="task-item">Complete Vue.js tutorial</div>
         <div class="task-item">Review code documentation</div>
+      </div>
+    </div>
+
+    <div class="card delayed">
+      <div class="card-title">Delayed Tasks</div>
+      <div class="task">
+        <div class="task-item delayed-item">Update portfolio website</div>
+        <div class="task-item delayed-item">Prepare presentation slides</div>
+        <div class="task-item delayed-item">Submit assignment report</div>
       </div>
     </div>
   </div>
@@ -72,15 +90,25 @@ body {
 .card-container {
   flex: 1;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 .card{
-  width: 400px;
+  flex: 1;
+  min-width: 300px;
   background: linear-gradient(rgb(20, 209, 211), rgba(82, 108, 96, 0.299),rgb(14, 10, 111));
   border-radius: 20px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  padding: 3rem;
+  padding: 2rem;
+}
+.card.completed {
+  background: linear-gradient(rgb(34, 197, 94), rgba(82, 108, 96, 0.299), rgb(21, 128, 61));
+}
+.card.delayed {
+  background: linear-gradient(rgb(239, 68, 68), rgba(108, 82, 82, 0.299), rgb(185, 28, 28));
 }
 .card-title{
   font-size: 2.1em;
@@ -103,6 +131,13 @@ body {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.completed-item {
+  text-decoration: line-through;
+  opacity: 0.8;
+}
+.delayed-item {
+  border-left: 4px solid #fbbf24;
 }
 #app {
   max-width: 1280px;
