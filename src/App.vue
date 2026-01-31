@@ -25,9 +25,17 @@
              @click="toggleTask('completed', index)" 
              :class="{expanded: expandedTask.type === 'completed' && expandedTask.index === index}">
           {{ task.title }}
-          <div class="task-date">Created: {{ formatDate(task.createdAt) }}</div>
+          <div class="task-meta">
+            <span class="task-date">Created: {{ formatDate(task.createdAt) }}</span>
+            <span class="task-hours">{{ task.estimatedHours }}h</span>
+          </div>
           <div v-if="expandedTask.type === 'completed' && expandedTask.index === index" class="task-description">
-            Task completed successfully
+            <div class="subtasks">
+              <div v-for="subtask in task.subtasks" :key="subtask.id" class="subtask-item">
+                <span :class="{ 'completed': subtask.completed }">{{ subtask.title }}</span>
+                <span class="subtask-hours">{{ subtask.hours }}h</span>
+              </div>
+            </div>
           </div>
         </div>
         <button v-if="completedTasks.length > visibleTasks.completed" 
@@ -45,9 +53,18 @@
              @click="toggleTask('active', index)" 
              :class="{expanded: expandedTask.type === 'active' && expandedTask.index === index}">
           {{ task.title }}
-          <div class="task-date">Due: {{ formatDate(task.dueDate) }}</div>
+          <div class="task-meta">
+            <span class="task-date">Due: {{ formatDate(task.dueDate) }}</span>
+            <span class="task-hours">{{ task.estimatedHours }}h</span>
+          </div>
           <div v-if="expandedTask.type === 'active' && expandedTask.index === index" class="task-description">
-            Click to mark as complete
+            <div class="subtasks">
+              <div v-for="subtask in task.subtasks" :key="subtask.id" class="subtask-item">
+                <input type="checkbox" v-model="subtask.completed" @click.stop>
+                <span :class="{ 'completed': subtask.completed }">{{ subtask.title }}</span>
+                <span class="subtask-hours">{{ subtask.hours }}h</span>
+              </div>
+            </div>
             <button @click.stop="completeTask(task.id)" class="complete-btn">✓</button>
           </div>
         </div>
@@ -66,9 +83,18 @@
              @click="toggleTask('delayed', index)" 
              :class="{expanded: expandedTask.type === 'delayed' && expandedTask.index === index}">
           {{ task.title }}
-          <div class="task-date">Due: {{ formatDate(task.dueDate) }}</div>
+          <div class="task-meta">
+            <span class="task-date">Due: {{ formatDate(task.dueDate) }}</span>
+            <span class="task-hours">{{ task.estimatedHours }}h</span>
+          </div>
           <div v-if="expandedTask.type === 'delayed' && expandedTask.index === index" class="task-description">
-            This task is overdue!
+            <div class="subtasks">
+              <div v-for="subtask in task.subtasks" :key="subtask.id" class="subtask-item">
+                <input type="checkbox" v-model="subtask.completed" @click.stop>
+                <span :class="{ 'completed': subtask.completed }">{{ subtask.title }}</span>
+                <span class="subtask-hours">{{ subtask.hours }}h</span>
+              </div>
+            </div>
             <button @click.stop="completeTask(task.id)" class="complete-btn">✓</button>
           </div>
         </div>
@@ -123,15 +149,119 @@ export default {
       notifications: [],
       visibleTasks: { completed: 3, active: 3, overdue: 3 },
       tasks: [
-        { id: 1, title: 'Working on final project', dueDate: new Date(2024, 11, 25), createdAt: new Date(2024, 11, 15), completed: false },
-        { id: 2, title: 'Study for exam', dueDate: new Date(2024, 11, 30), createdAt: new Date(2024, 11, 10), completed: false },
-        { id: 3, title: 'Complete Vue.js tutorial', dueDate: new Date(2024, 11, 28), createdAt: new Date(2024, 11, 12), completed: false },
-        { id: 4, title: 'Setup project structure', dueDate: new Date(2024, 11, 5), createdAt: new Date(2024, 11, 1), completed: true },
-        { id: 5, title: 'Design UI mockups', dueDate: new Date(2024, 11, 8), createdAt: new Date(2024, 11, 3), completed: true },
-        { id: 6, title: 'Install dependencies', dueDate: new Date(2024, 11, 10), createdAt: new Date(2024, 11, 5), completed: true },
-        { id: 7, title: 'Update portfolio website', dueDate: new Date(2024, 11, 20), createdAt: new Date(2024, 11, 8), completed: false },
-        { id: 8, title: 'Prepare presentation slides', dueDate: new Date(2024, 11, 22), createdAt: new Date(2024, 11, 10), completed: false },
-        { id: 9, title: 'Submit assignment report', dueDate: new Date(2024, 11, 18), createdAt: new Date(2024, 11, 5), completed: false }
+        { 
+          id: 1, 
+          title: 'Working on final project', 
+          dueDate: new Date(2024, 11, 25), 
+          createdAt: new Date(2024, 11, 15), 
+          completed: false,
+          estimatedHours: 8,
+          subtasks: [
+            { id: 11, title: 'Setup Vue components', completed: false, hours: 2 },
+            { id: 12, title: 'Implement task management', completed: false, hours: 4 },
+            { id: 13, title: 'Add calendar integration', completed: false, hours: 2 }
+          ]
+        },
+        { 
+          id: 2, 
+          title: 'Study for exam', 
+          dueDate: new Date(2024, 11, 30), 
+          createdAt: new Date(2024, 11, 10), 
+          completed: false,
+          estimatedHours: 6,
+          subtasks: [
+            { id: 21, title: 'Review chapters 1-5', completed: false, hours: 3 },
+            { id: 22, title: 'Practice problems', completed: false, hours: 2 },
+            { id: 23, title: 'Mock exam', completed: false, hours: 1 }
+          ]
+        },
+        { 
+          id: 3, 
+          title: 'Complete Vue.js tutorial', 
+          dueDate: new Date(2024, 11, 28), 
+          createdAt: new Date(2024, 11, 12), 
+          completed: false,
+          estimatedHours: 4,
+          subtasks: [
+            { id: 31, title: 'Watch tutorial videos', completed: false, hours: 2 },
+            { id: 32, title: 'Build sample app', completed: false, hours: 2 }
+          ]
+        },
+        { 
+          id: 4, 
+          title: 'Setup project structure', 
+          dueDate: new Date(2024, 11, 5), 
+          createdAt: new Date(2024, 11, 1), 
+          completed: true,
+          estimatedHours: 2,
+          subtasks: [
+            { id: 41, title: 'Create folders', completed: true, hours: 0.5 },
+            { id: 42, title: 'Initialize Git', completed: true, hours: 0.5 },
+            { id: 43, title: 'Setup package.json', completed: true, hours: 1 }
+          ]
+        },
+        { 
+          id: 5, 
+          title: 'Design UI mockups', 
+          dueDate: new Date(2024, 11, 8), 
+          createdAt: new Date(2024, 11, 3), 
+          completed: true,
+          estimatedHours: 3,
+          subtasks: [
+            { id: 51, title: 'Wireframes', completed: true, hours: 1 },
+            { id: 52, title: 'High-fidelity designs', completed: true, hours: 2 }
+          ]
+        },
+        { 
+          id: 6, 
+          title: 'Install dependencies', 
+          dueDate: new Date(2024, 11, 10), 
+          createdAt: new Date(2024, 11, 5), 
+          completed: true,
+          estimatedHours: 1,
+          subtasks: [
+            { id: 61, title: 'Install Vue 3', completed: true, hours: 0.5 },
+            { id: 62, title: 'Setup build tools', completed: true, hours: 0.5 }
+          ]
+        },
+        { 
+          id: 7, 
+          title: 'Update portfolio website', 
+          dueDate: new Date(2024, 11, 20), 
+          createdAt: new Date(2024, 11, 8), 
+          completed: false,
+          estimatedHours: 5,
+          subtasks: [
+            { id: 71, title: 'Add new projects', completed: false, hours: 2 },
+            { id: 72, title: 'Update resume section', completed: false, hours: 2 },
+            { id: 73, title: 'Improve responsive design', completed: false, hours: 1 }
+          ]
+        },
+        { 
+          id: 8, 
+          title: 'Prepare presentation slides', 
+          dueDate: new Date(2024, 11, 22), 
+          createdAt: new Date(2024, 11, 10), 
+          completed: false,
+          estimatedHours: 3,
+          subtasks: [
+            { id: 81, title: 'Create outline', completed: false, hours: 1 },
+            { id: 82, title: 'Design slides', completed: false, hours: 2 }
+          ]
+        },
+        { 
+          id: 9, 
+          title: 'Submit assignment report', 
+          dueDate: new Date(2024, 11, 18), 
+          createdAt: new Date(2024, 11, 5), 
+          completed: false,
+          estimatedHours: 4,
+          subtasks: [
+            { id: 91, title: 'Write introduction', completed: false, hours: 1 },
+            { id: 92, title: 'Document methodology', completed: false, hours: 2 },
+            { id: 93, title: 'Review and edit', completed: false, hours: 1 }
+          ]
+        }
       ]
     }
   },
@@ -372,10 +502,49 @@ body {
   font-size: 0.9em;
   opacity: 0.9;
 }
-.task-date {
-  font-size: 0.8em;
-  opacity: 0.7;
+.task-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-top: 0.3rem;
+}
+
+.task-hours {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.7em;
+  font-weight: bold;
+}
+
+.subtasks {
+  margin-top: 1rem;
+}
+
+.subtask-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.4rem 0;
+  font-size: 0.9em;
+}
+
+.subtask-item input[type="checkbox"] {
+  margin: 0;
+  transform: scale(1.2);
+}
+
+.subtask-item span.completed {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.subtask-hours {
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-size: 0.8em;
 }
 .completed-item {
   text-decoration: line-through;
