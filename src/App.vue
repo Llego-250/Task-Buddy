@@ -122,19 +122,12 @@ export default {
         { id: 1, title: 'Working on final project', dueDate: new Date(2024, 11, 25), createdAt: new Date(2024, 11, 15), completed: false },
         { id: 2, title: 'Study for exam', dueDate: new Date(2024, 11, 30), createdAt: new Date(2024, 11, 10), completed: false },
         { id: 3, title: 'Complete Vue.js tutorial', dueDate: new Date(2024, 11, 28), createdAt: new Date(2024, 11, 12), completed: false },
-        { id: 4, title: 'Review code documentation', dueDate: new Date(2024, 11, 27), createdAt: new Date(2024, 11, 14), completed: false },
-        { id: 5, title: 'Learn React basics', dueDate: new Date(2025, 0, 5), createdAt: new Date(2024, 11, 16), completed: false },
-        { id: 6, title: 'Practice JavaScript algorithms', dueDate: new Date(2025, 0, 8), createdAt: new Date(2024, 11, 17), completed: false },
-        { id: 7, title: 'Build personal blog', dueDate: new Date(2025, 0, 15), createdAt: new Date(2024, 11, 18), completed: false },
-        { id: 8, title: 'Setup project structure', dueDate: new Date(2024, 11, 5), createdAt: new Date(2024, 11, 1), completed: true },
-        { id: 9, title: 'Design UI mockups', dueDate: new Date(2024, 11, 8), createdAt: new Date(2024, 11, 3), completed: true },
-        { id: 10, title: 'Install dependencies', dueDate: new Date(2024, 11, 10), createdAt: new Date(2024, 11, 5), completed: true },
-        { id: 11, title: 'Write unit tests', dueDate: new Date(2024, 11, 15), createdAt: new Date(2024, 11, 1), completed: true },
-        { id: 12, title: 'Deploy to production', dueDate: new Date(2024, 11, 12), createdAt: new Date(2024, 11, 2), completed: true },
-        { id: 13, title: 'Code review session', dueDate: new Date(2024, 11, 14), createdAt: new Date(2024, 11, 3), completed: true },
-        { id: 14, title: 'Update portfolio website', dueDate: new Date(2024, 11, 20), createdAt: new Date(2024, 11, 8), completed: false },
-        { id: 15, title: 'Prepare presentation slides', dueDate: new Date(2024, 11, 22), createdAt: new Date(2024, 11, 10), completed: false },
-        { id: 16, title: 'Submit assignment report', dueDate: new Date(2024, 11, 18), createdAt: new Date(2024, 11, 5), completed: false }
+        { id: 4, title: 'Setup project structure', dueDate: new Date(2024, 11, 5), createdAt: new Date(2024, 11, 1), completed: true },
+        { id: 5, title: 'Design UI mockups', dueDate: new Date(2024, 11, 8), createdAt: new Date(2024, 11, 3), completed: true },
+        { id: 6, title: 'Install dependencies', dueDate: new Date(2024, 11, 10), createdAt: new Date(2024, 11, 5), completed: true },
+        { id: 7, title: 'Update portfolio website', dueDate: new Date(2024, 11, 20), createdAt: new Date(2024, 11, 8), completed: false },
+        { id: 8, title: 'Prepare presentation slides', dueDate: new Date(2024, 11, 22), createdAt: new Date(2024, 11, 10), completed: false },
+        { id: 9, title: 'Submit assignment report', dueDate: new Date(2024, 11, 18), createdAt: new Date(2024, 11, 5), completed: false }
       ]
     }
   },
