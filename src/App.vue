@@ -7,12 +7,28 @@
     <div class="input-section">
       <input v-model="newTask" type="text" placeholder="New task" @keyup.enter="addTask">
       <input v-model="taskDate" type="date" class="date-input">
+      <button @click="showSubtaskForm" class="subtask-btn">+ Subtasks</button>
       <button @click="addTask">ADD</button>
       <button @click="showCalendar" class="calendar-btn">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
           <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
         </svg>
       </button>
+    </div>
+
+    <!-- Subtask Form -->
+    <div v-if="showingSubtaskForm" class="subtask-form">
+      <h3>Add Subtasks</h3>
+      <div v-for="(subtask, index) in newSubtasks" :key="index" class="subtask-input">
+        <input v-model="subtask.title" type="text" placeholder="Subtask name">
+        <input v-model="subtask.hours" type="number" placeholder="Hours" min="0" step="0.5">
+        <button @click="removeSubtask(index)" class="remove-btn">×</button>
+      </div>
+      <button @click="addSubtask" class="add-subtask-btn">+ Add Subtask</button>
+      <div class="subtask-actions">
+        <button @click="hideSubtaskForm">Cancel</button>
+        <button @click="saveSubtasks">Save</button>
+      </div>
     </div>
   </div>
 
@@ -144,6 +160,8 @@ export default {
       expandedTask: { type: null, index: null },
       newTask: '',
       taskDate: '',
+      showingSubtaskForm: false,
+      newSubtasks: [],
       calendarVisible: false,
       currentDate: new Date(),
       notifications: [],
@@ -328,16 +346,45 @@ export default {
     },
     addTask() {
       if (this.newTask.trim() && this.taskDate) {
+        const totalHours = this.newSubtasks.reduce((sum, subtask) => sum + (parseFloat(subtask.hours) || 0), 0)
         this.tasks.push({
           id: Date.now(),
           title: this.newTask,
           dueDate: new Date(this.taskDate),
           createdAt: new Date(),
-          completed: false
+          completed: false,
+          estimatedHours: totalHours,
+          subtasks: this.newSubtasks.map((subtask, index) => ({
+            id: Date.now() + index,
+            title: subtask.title,
+            completed: false,
+            hours: parseFloat(subtask.hours) || 0
+          }))
         })
         this.newTask = ''
         this.taskDate = ''
+        this.newSubtasks = []
+        this.showingSubtaskForm = false
       }
+    },
+    showSubtaskForm() {
+      this.showingSubtaskForm = true
+      if (this.newSubtasks.length === 0) {
+        this.addSubtask()
+      }
+    },
+    hideSubtaskForm() {
+      this.showingSubtaskForm = false
+      this.newSubtasks = []
+    },
+    addSubtask() {
+      this.newSubtasks.push({ title: '', hours: 1 })
+    },
+    removeSubtask(index) {
+      this.newSubtasks.splice(index, 1)
+    },
+    saveSubtasks() {
+      this.showingSubtaskForm = false
     },
     completeTask(taskId) {
       const task = this.tasks.find(t => t.id === taskId)
@@ -783,5 +830,63 @@ button:active {
   font-size: 1.2em;
   cursor: pointer;
   margin-left: 10px;
+}
+
+.subtask-btn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.subtask-btn:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+}
+
+.subtask-form {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.subtask-form h3 {
+  color: white;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.subtask-input {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.subtask-input input[type="number"] {
+  width: 80px;
+}
+
+.remove-btn {
+  background: #ef4444;
+  padding: 8px 12px;
+  font-size: 16px;
+  min-width: auto;
+}
+
+.add-subtask-btn {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  margin-bottom: 1rem;
+}
+
+.subtask-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.subtask-actions button {
+  flex: 1;
+  max-width: 120px;
 }
 </style>
