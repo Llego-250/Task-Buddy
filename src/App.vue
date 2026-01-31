@@ -108,7 +108,19 @@ export default {
       tasks: [
         { id: 1, title: 'Working on final project', dueDate: new Date(2024, 11, 25), createdAt: new Date(2024, 11, 15), completed: false },
         { id: 2, title: 'Study for exam', dueDate: new Date(2024, 11, 30), createdAt: new Date(2024, 11, 10), completed: false },
-        { id: 3, title: 'Setup project structure', dueDate: new Date(2024, 11, 5), createdAt: new Date(2024, 11, 1), completed: true }
+        { id: 3, title: 'Complete Vue.js tutorial', dueDate: new Date(2024, 11, 28), createdAt: new Date(2024, 11, 12), completed: false },
+        { id: 4, title: 'Review code documentation', dueDate: new Date(2024, 11, 27), createdAt: new Date(2024, 11, 14), completed: false },
+        { id: 5, title: 'Setup project structure', dueDate: new Date(2024, 11, 5), createdAt: new Date(2024, 11, 1), completed: true },
+        { id: 6, title: 'Design UI mockups', dueDate: new Date(2024, 11, 8), createdAt: new Date(2024, 11, 3), completed: true },
+        { id: 7, title: 'Install dependencies', dueDate: new Date(2024, 11, 10), createdAt: new Date(2024, 11, 5), completed: true },
+        { id: 8, title: 'Update portfolio website', dueDate: new Date(2024, 11, 20), createdAt: new Date(2024, 11, 8), completed: false },
+        { id: 9, title: 'Prepare presentation slides', dueDate: new Date(2024, 11, 22), createdAt: new Date(2024, 11, 10), completed: false },
+        { id: 10, title: 'Submit assignment report', dueDate: new Date(2024, 11, 18), createdAt: new Date(2024, 11, 5), completed: false },
+        { id: 11, title: 'Learn React basics', dueDate: new Date(2025, 0, 5), createdAt: new Date(2024, 11, 16), completed: false },
+        { id: 12, title: 'Practice JavaScript algorithms', dueDate: new Date(2025, 0, 8), createdAt: new Date(2024, 11, 17), completed: false },
+        { id: 13, title: 'Build personal blog', dueDate: new Date(2025, 0, 15), createdAt: new Date(2024, 11, 18), completed: false },
+        { id: 14, title: 'Attend web dev workshop', dueDate: new Date(2025, 0, 12), createdAt: new Date(2024, 11, 19), completed: false },
+        { id: 15, title: 'Create mobile app prototype', dueDate: new Date(2025, 0, 20), createdAt: new Date(2024, 11, 20), completed: false }
       ]
     }
   },
