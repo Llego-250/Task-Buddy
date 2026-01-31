@@ -14,33 +14,102 @@
     <div class="card completed">
       <div class="card-title">Completed Tasks</div>
       <div class="task">
-        <div class="task-item completed-item">Setup project structure</div>
-        <div class="task-item completed-item">Design UI mockups</div>
-        <div class="task-item completed-item">Install dependencies</div>
+        <div class="task-item completed-item" @click="toggleTask('completed', 0)" :class="{expanded: expandedTask.type === 'completed' && expandedTask.index === 0}">
+          Setup project structure
+          <div v-if="expandedTask.type === 'completed' && expandedTask.index === 0" class="task-description">
+            Created folder structure, initialized Git repository, and set up basic Vue.js configuration files.
+          </div>
+        </div>
+        <div class="task-item completed-item" @click="toggleTask('completed', 1)" :class="{expanded: expandedTask.type === 'completed' && expandedTask.index === 1}">
+          Design UI mockups
+          <div v-if="expandedTask.type === 'completed' && expandedTask.index === 1" class="task-description">
+            Created wireframes and high-fidelity mockups for all main pages using Figma.
+          </div>
+        </div>
+        <div class="task-item completed-item" @click="toggleTask('completed', 2)" :class="{expanded: expandedTask.type === 'completed' && expandedTask.index === 2}">
+          Install dependencies
+          <div v-if="expandedTask.type === 'completed' && expandedTask.index === 2" class="task-description">
+            Installed Vue 3, Vue Router, and other necessary packages for the project.
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="card">
       <div class="card-title">Tasks</div>
       <div class="task">
-        <div class="task-item">Working on final project</div>
-        <div class="task-item">Study for exam</div>
-        <div class="task-item">Complete Vue.js tutorial</div>
-        <div class="task-item">Review code documentation</div>
+        <div class="task-item" @click="toggleTask('active', 0)" :class="{expanded: expandedTask.type === 'active' && expandedTask.index === 0}">
+          Working on final project
+          <div v-if="expandedTask.type === 'active' && expandedTask.index === 0" class="task-description">
+            Developing the main features of the task management application with Vue.js components.
+          </div>
+        </div>
+        <div class="task-item" @click="toggleTask('active', 1)" :class="{expanded: expandedTask.type === 'active' && expandedTask.index === 1}">
+          Study for exam
+          <div v-if="expandedTask.type === 'active' && expandedTask.index === 1" class="task-description">
+            Review chapters 5-8 of the web development textbook and practice coding exercises.
+          </div>
+        </div>
+        <div class="task-item" @click="toggleTask('active', 2)" :class="{expanded: expandedTask.type === 'active' && expandedTask.index === 2}">
+          Complete Vue.js tutorial
+          <div v-if="expandedTask.type === 'active' && expandedTask.index === 2" class="task-description">
+            Finish the official Vue.js tutorial series and build the sample todo application.
+          </div>
+        </div>
+        <div class="task-item" @click="toggleTask('active', 3)" :class="{expanded: expandedTask.type === 'active' && expandedTask.index === 3}">
+          Review code documentation
+          <div v-if="expandedTask.type === 'active' && expandedTask.index === 3" class="task-description">
+            Go through project documentation and update comments for better code maintainability.
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="card delayed">
       <div class="card-title">Delayed Tasks</div>
       <div class="task">
-        <div class="task-item delayed-item">Update portfolio website</div>
-        <div class="task-item delayed-item">Prepare presentation slides</div>
-        <div class="task-item delayed-item">Submit assignment report</div>
+        <div class="task-item delayed-item" @click="toggleTask('delayed', 0)" :class="{expanded: expandedTask.type === 'delayed' && expandedTask.index === 0}">
+          Update portfolio website
+          <div v-if="expandedTask.type === 'delayed' && expandedTask.index === 0" class="task-description">
+            Add recent projects, update resume section, and improve responsive design.
+          </div>
+        </div>
+        <div class="task-item delayed-item" @click="toggleTask('delayed', 1)" :class="{expanded: expandedTask.type === 'delayed' && expandedTask.index === 1}">
+          Prepare presentation slides
+          <div v-if="expandedTask.type === 'delayed' && expandedTask.index === 1" class="task-description">
+            Create PowerPoint presentation for the final project demo with screenshots and explanations.
+          </div>
+        </div>
+        <div class="task-item delayed-item" @click="toggleTask('delayed', 2)" :class="{expanded: expandedTask.type === 'delayed' && expandedTask.index === 2}">
+          Submit assignment report
+          <div v-if="expandedTask.type === 'delayed' && expandedTask.index === 2" class="task-description">
+            Write comprehensive report documenting the development process and technical decisions.
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 </template>
+
+<script>
+export default {
+  data() {
+    return {
+      expandedTask: { type: null, index: null }
+    }
+  },
+  methods: {
+    toggleTask(type, index) {
+      if (this.expandedTask.type === type && this.expandedTask.index === index) {
+        this.expandedTask = { type: null, index: null }
+      } else {
+        this.expandedTask = { type, index }
+      }
+    }
+  }
+}
+</script>
 
 <style>
 :root {
@@ -131,6 +200,21 @@ body {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.task-item:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+.task-item.expanded {
+  background: rgba(255, 255, 255, 0.15);
+}
+.task-description {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 0.9em;
+  opacity: 0.9;
 }
 .completed-item {
   text-decoration: line-through;
