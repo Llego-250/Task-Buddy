@@ -220,9 +220,6 @@ body {
   text-decoration: line-through;
   opacity: 0.8;
 }
-.delayed-item {
-  border-left: 4px solid #fbbf24;
-}
 #app {
   max-width: 1280px;
   margin: 0 auto;
