@@ -1,13 +1,14 @@
 <template>
-<div class="main-container">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<div class="main-container" :class="{ blurred: calendarVisible }">
   <div class="header">
     <h1 class="title">TaskBuddy</h1>
     <h2 class="subtitle">Hello Beautiful User❤️, this is the personal task manager</h2>
     
     <div class="input-section">
-      <input type="text" name="New task" placeholder="new task">
-      <button>ADD</button>
+      <input v-model="newTask" type="text" placeholder="New task" @keyup.enter="addTask">
+      <input v-model="taskDate" type="date" class="date-input">
+      <button @click="addTask">ADD</button>
+      <button @click="showCalendar" class="calendar-btn">📅</button>
     </div>
   </div>
 
@@ -15,103 +16,81 @@
     <div class="card completed">
       <div class="card-title">Completed Tasks</div>
       <div class="task">
-        <div class="task-item completed-item" @click="toggleTask('completed', 0)" :class="{expanded: expandedTask.type === 'completed' && expandedTask.index === 0}">
-          Setup project structure
-          <div v-if="expandedTask.type === 'completed' && expandedTask.index === 0" class="task-description">
-            Created folder structure, initialized Git repository, and set up basic Vue.js configuration files.
-          </div>
-        </div>
-        <div class="task-item completed-item" @click="toggleTask('completed', 1)" :class="{expanded: expandedTask.type === 'completed' && expandedTask.index === 1}">
-          Design UI mockups
-          <div v-if="expandedTask.type === 'completed' && expandedTask.index === 1" class="task-description">
-            Created wireframes and high-fidelity mockups for all main pages using Figma.
-          </div>
-        </div>
-        <div class="task-item completed-item" @click="toggleTask('completed', 2)" :class="{expanded: expandedTask.type === 'completed' && expandedTask.index === 2}">
-          Install dependencies
-          <div v-if="expandedTask.type === 'completed' && expandedTask.index === 2" class="task-description">
-            Installed Vue 3, Vue Router, and other necessary packages for the project.
+        <div v-for="(task, index) in completedTasks" :key="task.id" 
+             class="task-item completed-item" 
+             @click="toggleTask('completed', index)" 
+             :class="{expanded: expandedTask.type === 'completed' && expandedTask.index === index}">
+          {{ task.title }}
+          <div class="task-date">Created: {{ formatDate(task.createdAt) }}</div>
+          <div v-if="expandedTask.type === 'completed' && expandedTask.index === index" class="task-description">
+            Task completed successfully
           </div>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-title">Tasks</div>
+      <div class="card-title">Active Tasks</div>
       <div class="task">
-        <div class="task-item" @click="toggleTask('active', 0)" :class="{expanded: expandedTask.type === 'active' && expandedTask.index === 0}">
-          Working on final project
-          <div v-if="expandedTask.type === 'active' && expandedTask.index === 0" class="task-description">
-            Developing the main features of the task management application with Vue.js components.
-          </div>
-        </div>
-        <div class="task-item" @click="toggleTask('active', 1)" :class="{expanded: expandedTask.type === 'active' && expandedTask.index === 1}">
-          Study for exam
-          <div v-if="expandedTask.type === 'active' && expandedTask.index === 1" class="task-description">
-            Review chapters 5-8 of the web development textbook and practice coding exercises.
-          </div>
-        </div>
-        <div class="task-item" @click="toggleTask('active', 2)" :class="{expanded: expandedTask.type === 'active' && expandedTask.index === 2}">
-          Complete Vue.js tutorial
-          <div v-if="expandedTask.type === 'active' && expandedTask.index === 2" class="task-description">
-            Finish the official Vue.js tutorial series and build the sample todo application.
-          </div>
-        </div>
-        <div class="task-item" @click="toggleTask('active', 3)" :class="{expanded: expandedTask.type === 'active' && expandedTask.index === 3}">
-          Review code documentation
-          <div v-if="expandedTask.type === 'active' && expandedTask.index === 3" class="task-description">
-            Go through project documentation and update comments for better code maintainability.
+        <div v-for="(task, index) in activeTasks" :key="task.id" 
+             class="task-item" 
+             @click="toggleTask('active', index)" 
+             :class="{expanded: expandedTask.type === 'active' && expandedTask.index === index}">
+          {{ task.title }}
+          <div class="task-date">Due: {{ formatDate(task.dueDate) }}</div>
+          <div v-if="expandedTask.type === 'active' && expandedTask.index === index" class="task-description">
+            Click to mark as complete
+            <button @click.stop="completeTask(task.id)" class="complete-btn">✓</button>
           </div>
         </div>
       </div>
     </div>
 
     <div class="card delayed">
-      <div class="card-title">Delayed Tasks</div>
+      <div class="card-title">Overdue Tasks</div>
       <div class="task">
-        <div class="task-item delayed-item" @click="toggleTask('delayed', 0)" :class="{expanded: expandedTask.type === 'delayed' && expandedTask.index === 0}">
-          Update portfolio website
-          <div v-if="expandedTask.type === 'delayed' && expandedTask.index === 0" class="task-description">
-            Add recent projects, update resume section, and improve responsive design.
-          </div>
-        </div>
-        <div class="task-item delayed-item" @click="toggleTask('delayed', 1)" :class="{expanded: expandedTask.type === 'delayed' && expandedTask.index === 1}">
-          Prepare presentation slides
-          <div v-if="expandedTask.type === 'delayed' && expandedTask.index === 1" class="task-description">
-            Create PowerPoint presentation for the final project demo with screenshots and explanations.
-          </div>
-        </div>
-        <div class="task-item delayed-item" @click="toggleTask('delayed', 2)" :class="{expanded: expandedTask.type === 'delayed' && expandedTask.index === 2}">
-          Submit assignment report
-          <div v-if="expandedTask.type === 'delayed' && expandedTask.index === 2" class="task-description">
-            Write comprehensive report documenting the development process and technical decisions.
+        <div v-for="(task, index) in overdueTasks" :key="task.id" 
+             class="task-item delayed-item" 
+             @click="toggleTask('delayed', index)" 
+             :class="{expanded: expandedTask.type === 'delayed' && expandedTask.index === index}">
+          {{ task.title }}
+          <div class="task-date">Due: {{ formatDate(task.dueDate) }}</div>
+          <div v-if="expandedTask.type === 'delayed' && expandedTask.index === index" class="task-description">
+            This task is overdue!
+            <button @click.stop="completeTask(task.id)" class="complete-btn">✓</button>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <div class="calendar-section">
-    <div class="calendar-card">
-      <div class="calendar-header">
-        <i class="fas fa-calendar-alt"></i>
-        <h3>Task Calendar</h3>
-      </div>
-      <div class="calendar">
-        <div class="calendar-nav">
-          <button @click="prevMonth" class="nav-btn"><i class="fas fa-chevron-left"></i></button>
-          <span class="month-year">{{ currentMonthYear }}</span>
-          <button @click="nextMonth" class="nav-btn"><i class="fas fa-chevron-right"></i></button>
-        </div>
-        <div class="calendar-grid">
-          <div class="day-header" v-for="day in dayHeaders" :key="day">{{ day }}</div>
-          <div v-for="date in calendarDates" :key="date.key" 
-               :class="['calendar-date', { 'other-month': !date.currentMonth, 'today': date.isToday, 'has-task': date.hasTask }]">
-            {{ date.day }}
-          </div>
-        </div>
+<!-- Calendar Modal -->
+<div v-if="calendarVisible" class="calendar-overlay" @click="hideCalendar">
+  <div class="calendar-modal" @click.stop>
+    <div class="calendar-header">
+      <button @click="previousMonth">‹</button>
+      <span>{{ currentMonthYear }}</span>
+      <button @click="nextMonth">›</button>
+      <button @click="hideCalendar" class="close-btn">×</button>
+    </div>
+    <div class="calendar-grid">
+      <div class="day-header" v-for="day in dayHeaders" :key="day">{{ day }}</div>
+      <div v-for="date in calendarDates" :key="date.date" 
+           :class="['calendar-day', { 'has-task': date.hasTasks, 'other-month': !date.isCurrentMonth }]"
+           @click="showTasksForDate(date.date)">
+        {{ date.day }}
+        <div v-if="date.hasTasks" class="task-indicator">{{ date.taskCount }}</div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Notifications -->
+<div v-if="notifications.length" class="notifications">
+  <div v-for="notification in notifications" :key="notification.id" class="notification">
+    🔔 {{ notification.message }}
+    <button @click="dismissNotification(notification.id)">×</button>
   </div>
 </div>
 </template>
@@ -121,38 +100,56 @@ export default {
   data() {
     return {
       expandedTask: { type: null, index: null },
+      newTask: '',
+      taskDate: '',
+      calendarVisible: false,
       currentDate: new Date(),
-      dayHeaders: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+      notifications: [],
+      tasks: [
+        { id: 1, title: 'Working on final project', dueDate: new Date(2024, 11, 25), createdAt: new Date(2024, 11, 15), completed: false },
+        { id: 2, title: 'Study for exam', dueDate: new Date(2024, 11, 30), createdAt: new Date(2024, 11, 10), completed: false },
+        { id: 3, title: 'Setup project structure', dueDate: new Date(2024, 11, 5), createdAt: new Date(2024, 11, 1), completed: true }
+      ]
     }
   },
   computed: {
+    activeTasks() {
+      return this.tasks.filter(task => !task.completed && new Date(task.dueDate) >= new Date().setHours(0,0,0,0))
+    },
+    completedTasks() {
+      return this.tasks.filter(task => task.completed)
+    },
+    overdueTasks() {
+      return this.tasks.filter(task => !task.completed && new Date(task.dueDate) < new Date().setHours(0,0,0,0))
+    },
     currentMonthYear() {
       return this.currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    },
+    dayHeaders() {
+      return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
     },
     calendarDates() {
       const year = this.currentDate.getFullYear()
       const month = this.currentDate.getMonth()
       const firstDay = new Date(year, month, 1)
-      const lastDay = new Date(year, month + 1, 0)
       const startDate = new Date(firstDay)
       startDate.setDate(startDate.getDate() - firstDay.getDay())
       
       const dates = []
-      const today = new Date()
-      
       for (let i = 0; i < 42; i++) {
         const date = new Date(startDate)
         date.setDate(startDate.getDate() + i)
-        
+        const tasksForDate = this.tasks.filter(task => 
+          new Date(task.dueDate).toDateString() === date.toDateString()
+        )
         dates.push({
+          date: new Date(date),
           day: date.getDate(),
-          currentMonth: date.getMonth() === month,
-          isToday: date.toDateString() === today.toDateString(),
-          hasTask: [15, 20, 25].includes(date.getDate()) && date.getMonth() === month,
-          key: date.toISOString()
+          isCurrentMonth: date.getMonth() === month,
+          hasTasks: tasksForDate.length > 0,
+          taskCount: tasksForDate.length
         })
       }
-      
       return dates
     }
   },
@@ -164,12 +161,64 @@ export default {
         this.expandedTask = { type, index }
       }
     },
-    prevMonth() {
+    addTask() {
+      if (this.newTask.trim() && this.taskDate) {
+        this.tasks.push({
+          id: Date.now(),
+          title: this.newTask,
+          dueDate: new Date(this.taskDate),
+          createdAt: new Date(),
+          completed: false
+        })
+        this.newTask = ''
+        this.taskDate = ''
+      }
+    },
+    completeTask(taskId) {
+      const task = this.tasks.find(t => t.id === taskId)
+      if (task) {
+        task.completed = true
+      }
+    },
+    formatDate(date) {
+      return new Date(date).toLocaleDateString()
+    },
+    showCalendar() {
+      this.calendarVisible = true
+    },
+    hideCalendar() {
+      this.calendarVisible = false
+    },
+    previousMonth() {
       this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() - 1, 1)
     },
     nextMonth() {
       this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 1)
+    },
+    showTasksForDate(date) {
+      const tasksForDate = this.tasks.filter(task => 
+        new Date(task.dueDate).toDateString() === date.toDateString()
+      )
+      if (tasksForDate.length > 0) {
+        alert(`Tasks for ${date.toDateString()}:\n${tasksForDate.map(t => t.title).join('\n')}`)
+      }
+    },
+    dismissNotification(id) {
+      this.notifications = this.notifications.filter(n => n.id !== id)
     }
+  },
+  mounted() {
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    const upcomingTasks = this.tasks.filter(task => 
+      !task.completed && new Date(task.dueDate).toDateString() === tomorrow.toDateString()
+    )
+    upcomingTasks.forEach(task => {
+      this.notifications.push({
+        id: Date.now() + Math.random(),
+        message: `Reminder: "${task.title}" is due tomorrow!`
+      })
+    })
   }
 }
 </script>
@@ -201,6 +250,15 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+.main-container {
+  transition: filter 0.3s ease;
+}
+
+.main-container.blurred {
+  filter: blur(5px);
+}
+
 .header {
   text-align: center;
   margin-bottom: 2rem;
@@ -279,9 +337,23 @@ body {
   font-size: 0.9em;
   opacity: 0.9;
 }
+.task-date {
+  font-size: 0.8em;
+  opacity: 0.7;
+  margin-top: 0.3rem;
+}
 .completed-item {
   text-decoration: line-through;
   opacity: 0.8;
+}
+.complete-btn {
+  background: #22c55e;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-left: 10px;
+  cursor: pointer;
 }
 #app {
   max-width: 1280px;
@@ -321,94 +393,139 @@ button:hover {
   background-color: #0056b3;
 }
 
-.calendar-section {
-  margin-top: 2rem;
+.date-input {
+  margin: 5px;
+}
+
+.calendar-btn {
+  font-size: 1.2em;
+  margin-left: 10px;
+}
+
+.calendar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
-.calendar-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+
+.calendar-modal {
+  background: linear-gradient(135deg, rgb(30, 58, 138), rgb(6, 182, 212));
   border-radius: 20px;
   padding: 2rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   max-width: 400px;
-  width: 100%;
+  width: 90%;
 }
+
 .calendar-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-}
-.calendar-header i {
-  font-size: 1.5rem;
-  color: #60a5fa;
-}
-.calendar-header h3 {
-  color: white;
-  margin: 0;
-  font-size: 1.5rem;
-}
-.calendar-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+  color: white;
+  font-weight: bold;
 }
-.nav-btn {
+
+.calendar-header button {
   background: rgba(255, 255, 255, 0.2);
   border: none;
-  border-radius: 50%;
-  width: 35px;
-  height: 35px;
   color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
   cursor: pointer;
+}
+
+.close-btn {
+  font-size: 1.5em !important;
+  padding: 2px 8px !important;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.day-header {
+  text-align: center;
+  font-weight: bold;
+  color: white;
+  padding: 10px 5px;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  cursor: pointer;
+  position: relative;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.calendar-day:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.calendar-day.other-month {
+  opacity: 0.3;
+}
+
+.calendar-day.has-task {
+  background: rgba(34, 197, 94, 0.3);
+  border: 2px solid rgba(34, 197, 94, 0.8);
+}
+
+.task-indicator {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.nav-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+
+.notifications {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 999;
 }
-.month-year {
+
+.notification {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
   color: white;
-  font-weight: bold;
-  font-size: 1.1rem;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
-}
-.day-header {
-  text-align: center;
-  padding: 0.5rem;
-  font-weight: bold;
-  color: #60a5fa;
-  font-size: 0.9rem;
-}
-.calendar-date {
-  text-align: center;
-  padding: 0.5rem;
+
+.notification button {
+  background: none;
+  border: none;
   color: white;
+  font-size: 1.2em;
   cursor: pointer;
-  border-radius: 5px;
-  transition: background 0.2s;
-}
-.calendar-date:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-.calendar-date.other-month {
-  color: rgba(255, 255, 255, 0.3);
-}
-.calendar-date.today {
-  background: #60a5fa;
-  font-weight: bold;
-}
-.calendar-date.has-task {
-  background: #f59e0b;
-  font-weight: bold;
+  margin-left: 10px;
 }
 </style>
