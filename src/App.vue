@@ -16,7 +16,7 @@
     <div class="card completed">
       <div class="card-title">Completed Tasks</div>
       <div class="task">
-        <div v-for="(task, index) in completedTasks" :key="task.id" 
+        <div v-for="(task, index) in visibleCompletedTasks" :key="task.id" 
              class="task-item completed-item" 
              @click="toggleTask('completed', index)" 
              :class="{expanded: expandedTask.type === 'completed' && expandedTask.index === index}">
@@ -26,13 +26,17 @@
             Task completed successfully
           </div>
         </div>
+        <button v-if="completedTasks.length > visibleTasks.completed" 
+                @click="loadMoreTasks('completed')" class="view-more-btn">
+          View More ({{ completedTasks.length - visibleTasks.completed }} remaining)
+        </button>
       </div>
     </div>
 
     <div class="card">
       <div class="card-title">Active Tasks</div>
       <div class="task">
-        <div v-for="(task, index) in activeTasks" :key="task.id" 
+        <div v-for="(task, index) in visibleActiveTasks" :key="task.id" 
              class="task-item" 
              @click="toggleTask('active', index)" 
              :class="{expanded: expandedTask.type === 'active' && expandedTask.index === index}">
@@ -43,13 +47,17 @@
             <button @click.stop="completeTask(task.id)" class="complete-btn">✓</button>
           </div>
         </div>
+        <button v-if="activeTasks.length > visibleTasks.active" 
+                @click="loadMoreTasks('active')" class="view-more-btn">
+          View More ({{ activeTasks.length - visibleTasks.active }} remaining)
+        </button>
       </div>
     </div>
 
     <div class="card delayed">
       <div class="card-title">Overdue Tasks</div>
       <div class="task">
-        <div v-for="(task, index) in overdueTasks" :key="task.id" 
+        <div v-for="(task, index) in visibleOverdueTasks" :key="task.id" 
              class="task-item delayed-item" 
              @click="toggleTask('delayed', index)" 
              :class="{expanded: expandedTask.type === 'delayed' && expandedTask.index === index}">
@@ -60,6 +68,10 @@
             <button @click.stop="completeTask(task.id)" class="complete-btn">✓</button>
           </div>
         </div>
+        <button v-if="overdueTasks.length > visibleTasks.overdue" 
+                @click="loadMoreTasks('overdue')" class="view-more-btn">
+          View More ({{ overdueTasks.length - visibleTasks.overdue }} remaining)
+        </button>
       </div>
     </div>
   </div>
@@ -105,22 +117,27 @@ export default {
       calendarVisible: false,
       currentDate: new Date(),
       notifications: [],
+      visibleTasks: { completed: 5, active: 5, overdue: 5 },
       tasks: [
         { id: 1, title: 'Working on final project', dueDate: new Date(2024, 11, 25), createdAt: new Date(2024, 11, 15), completed: false },
         { id: 2, title: 'Study for exam', dueDate: new Date(2024, 11, 30), createdAt: new Date(2024, 11, 10), completed: false },
         { id: 3, title: 'Complete Vue.js tutorial', dueDate: new Date(2024, 11, 28), createdAt: new Date(2024, 11, 12), completed: false },
         { id: 4, title: 'Review code documentation', dueDate: new Date(2024, 11, 27), createdAt: new Date(2024, 11, 14), completed: false },
-        { id: 5, title: 'Setup project structure', dueDate: new Date(2024, 11, 5), createdAt: new Date(2024, 11, 1), completed: true },
-        { id: 6, title: 'Design UI mockups', dueDate: new Date(2024, 11, 8), createdAt: new Date(2024, 11, 3), completed: true },
-        { id: 7, title: 'Install dependencies', dueDate: new Date(2024, 11, 10), createdAt: new Date(2024, 11, 5), completed: true },
-        { id: 8, title: 'Update portfolio website', dueDate: new Date(2024, 11, 20), createdAt: new Date(2024, 11, 8), completed: false },
-        { id: 9, title: 'Prepare presentation slides', dueDate: new Date(2024, 11, 22), createdAt: new Date(2024, 11, 10), completed: false },
-        { id: 10, title: 'Submit assignment report', dueDate: new Date(2024, 11, 18), createdAt: new Date(2024, 11, 5), completed: false },
-        { id: 11, title: 'Learn React basics', dueDate: new Date(2025, 0, 5), createdAt: new Date(2024, 11, 16), completed: false },
-        { id: 12, title: 'Practice JavaScript algorithms', dueDate: new Date(2025, 0, 8), createdAt: new Date(2024, 11, 17), completed: false },
-        { id: 13, title: 'Build personal blog', dueDate: new Date(2025, 0, 15), createdAt: new Date(2024, 11, 18), completed: false },
-        { id: 14, title: 'Attend web dev workshop', dueDate: new Date(2025, 0, 12), createdAt: new Date(2024, 11, 19), completed: false },
-        { id: 15, title: 'Create mobile app prototype', dueDate: new Date(2025, 0, 20), createdAt: new Date(2024, 11, 20), completed: false }
+        { id: 5, title: 'Learn React basics', dueDate: new Date(2025, 0, 5), createdAt: new Date(2024, 11, 16), completed: false },
+        { id: 6, title: 'Practice JavaScript algorithms', dueDate: new Date(2025, 0, 8), createdAt: new Date(2024, 11, 17), completed: false },
+        { id: 7, title: 'Build personal blog', dueDate: new Date(2025, 0, 15), createdAt: new Date(2024, 11, 18), completed: false },
+        { id: 8, title: 'Attend web dev workshop', dueDate: new Date(2025, 0, 12), createdAt: new Date(2024, 11, 19), completed: false },
+        { id: 9, title: 'Create mobile app prototype', dueDate: new Date(2025, 0, 20), createdAt: new Date(2024, 11, 20), completed: false },
+        { id: 10, title: 'Setup project structure', dueDate: new Date(2024, 11, 5), createdAt: new Date(2024, 11, 1), completed: true },
+        { id: 11, title: 'Design UI mockups', dueDate: new Date(2024, 11, 8), createdAt: new Date(2024, 11, 3), completed: true },
+        { id: 12, title: 'Install dependencies', dueDate: new Date(2024, 11, 10), createdAt: new Date(2024, 11, 5), completed: true },
+        { id: 13, title: 'Write unit tests', dueDate: new Date(2024, 11, 15), createdAt: new Date(2024, 11, 1), completed: true },
+        { id: 14, title: 'Deploy to production', dueDate: new Date(2024, 11, 12), createdAt: new Date(2024, 11, 2), completed: true },
+        { id: 15, title: 'Code review session', dueDate: new Date(2024, 11, 14), createdAt: new Date(2024, 11, 3), completed: true },
+        { id: 16, title: 'Database optimization', dueDate: new Date(2024, 11, 16), createdAt: new Date(2024, 11, 4), completed: true },
+        { id: 17, title: 'Update portfolio website', dueDate: new Date(2024, 11, 20), createdAt: new Date(2024, 11, 8), completed: false },
+        { id: 18, title: 'Prepare presentation slides', dueDate: new Date(2024, 11, 22), createdAt: new Date(2024, 11, 10), completed: false },
+        { id: 19, title: 'Submit assignment report', dueDate: new Date(2024, 11, 18), createdAt: new Date(2024, 11, 5), completed: false }
       ]
     }
   },
@@ -133,6 +150,15 @@ export default {
     },
     overdueTasks() {
       return this.tasks.filter(task => !task.completed && new Date(task.dueDate) < new Date().setHours(0,0,0,0))
+    },
+    visibleActiveTasks() {
+      return this.activeTasks.slice(0, this.visibleTasks.active)
+    },
+    visibleCompletedTasks() {
+      return this.completedTasks.slice(0, this.visibleTasks.completed)
+    },
+    visibleOverdueTasks() {
+      return this.overdueTasks.slice(0, this.visibleTasks.overdue)
     },
     currentMonthYear() {
       return this.currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
@@ -172,6 +198,9 @@ export default {
       } else {
         this.expandedTask = { type, index }
       }
+    },
+    loadMoreTasks(type) {
+      this.visibleTasks[type] += 5
     },
     addTask() {
       if (this.newTask.trim() && this.taskDate) {
@@ -403,6 +432,22 @@ button {
 
 button:hover {
   background-color: #0056b3;
+}
+
+.view-more-btn {
+  width: 100%;
+  margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 0.8rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.view-more-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .date-input {
