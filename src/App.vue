@@ -1,5 +1,6 @@
 <template>
 <div class="main-container">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <div class="header">
     <h1 class="title">TaskBuddy</h1>
     <h2 class="subtitle">Hello Beautiful User❤️, this is the personal task manager</h2>
@@ -89,6 +90,29 @@
       </div>
     </div>
   </div>
+
+  <div class="calendar-section">
+    <div class="calendar-card">
+      <div class="calendar-header">
+        <i class="fas fa-calendar-alt"></i>
+        <h3>Task Calendar</h3>
+      </div>
+      <div class="calendar">
+        <div class="calendar-nav">
+          <button @click="prevMonth" class="nav-btn"><i class="fas fa-chevron-left"></i></button>
+          <span class="month-year">{{ currentMonthYear }}</span>
+          <button @click="nextMonth" class="nav-btn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <div class="calendar-grid">
+          <div class="day-header" v-for="day in dayHeaders" :key="day">{{ day }}</div>
+          <div v-for="date in calendarDates" :key="date.key" 
+               :class="['calendar-date', { 'other-month': !date.currentMonth, 'today': date.isToday, 'has-task': date.hasTask }]">
+            {{ date.day }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 </template>
 
@@ -96,7 +120,40 @@
 export default {
   data() {
     return {
-      expandedTask: { type: null, index: null }
+      expandedTask: { type: null, index: null },
+      currentDate: new Date(),
+      dayHeaders: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    }
+  },
+  computed: {
+    currentMonthYear() {
+      return this.currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    },
+    calendarDates() {
+      const year = this.currentDate.getFullYear()
+      const month = this.currentDate.getMonth()
+      const firstDay = new Date(year, month, 1)
+      const lastDay = new Date(year, month + 1, 0)
+      const startDate = new Date(firstDay)
+      startDate.setDate(startDate.getDate() - firstDay.getDay())
+      
+      const dates = []
+      const today = new Date()
+      
+      for (let i = 0; i < 42; i++) {
+        const date = new Date(startDate)
+        date.setDate(startDate.getDate() + i)
+        
+        dates.push({
+          day: date.getDate(),
+          currentMonth: date.getMonth() === month,
+          isToday: date.toDateString() === today.toDateString(),
+          hasTask: [15, 20, 25].includes(date.getDate()) && date.getMonth() === month,
+          key: date.toISOString()
+        })
+      }
+      
+      return dates
     }
   },
   methods: {
@@ -106,6 +163,12 @@ export default {
       } else {
         this.expandedTask = { type, index }
       }
+    },
+    prevMonth() {
+      this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() - 1, 1)
+    },
+    nextMonth() {
+      this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 1)
     }
   }
 }
@@ -256,5 +319,96 @@ button {
 
 button:hover {
   background-color: #0056b3;
+}
+
+.calendar-section {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+}
+.calendar-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 100%;
+}
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+.calendar-header i {
+  font-size: 1.5rem;
+  color: #60a5fa;
+}
+.calendar-header h3 {
+  color: white;
+  margin: 0;
+  font-size: 1.5rem;
+}
+.calendar-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.nav-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nav-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+.month-year {
+  color: white;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.day-header {
+  text-align: center;
+  padding: 0.5rem;
+  font-weight: bold;
+  color: #60a5fa;
+  font-size: 0.9rem;
+}
+.calendar-date {
+  text-align: center;
+  padding: 0.5rem;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background 0.2s;
+}
+.calendar-date:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.calendar-date.other-month {
+  color: rgba(255, 255, 255, 0.3);
+}
+.calendar-date.today {
+  background: #60a5fa;
+  font-weight: bold;
+}
+.calendar-date.has-task {
+  background: #f59e0b;
+  font-weight: bold;
 }
 </style>
