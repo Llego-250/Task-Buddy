@@ -5,10 +5,7 @@
     <h2 class="subtitle">Hello Beautiful User❤️, this is the personal task manager</h2>
     
     <div class="input-section">
-      <input v-model="newTask" type="text" placeholder="New task" @keyup.enter="addTask">
-      <input v-model="taskDate" type="date" class="date-input">
-      <button @click="showSubtaskForm" class="subtask-btn">+ Subtasks</button>
-      <button @click="addTask">ADD</button>
+      <button @click="showTaskForm" class="create-task-btn">+ Create New Task</button>
       <button @click="showCalendar" class="calendar-btn">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
           <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
@@ -16,18 +13,32 @@
       </button>
     </div>
 
-    <!-- Subtask Form -->
-    <div v-if="showingSubtaskForm" class="subtask-form">
-      <h3>Add Subtasks</h3>
-      <div v-for="(subtask, index) in newSubtasks" :key="index" class="subtask-input">
-        <input v-model="subtask.title" type="text" placeholder="Subtask name">
-        <input v-model="subtask.hours" type="number" placeholder="Hours" min="0" step="0.5">
-        <button @click="removeSubtask(index)" class="remove-btn">×</button>
-      </div>
-      <button @click="addSubtask" class="add-subtask-btn">+ Add Subtask</button>
-      <div class="subtask-actions">
-        <button @click="hideSubtaskForm">Cancel</button>
-        <button @click="saveSubtasks">Save</button>
+    <!-- Task Creation Modal -->
+    <div v-if="showingTaskForm" class="task-overlay" @click="hideTaskForm">
+      <div class="task-modal" @click.stop>
+        <div class="task-header">
+          <h3>Create New Task</h3>
+          <button @click="hideTaskForm" class="close-btn">×</button>
+        </div>
+        <div class="task-form">
+          <input v-model="newTask" type="text" placeholder="Task name" class="task-input">
+          <input v-model="taskDate" type="date" class="task-input">
+          
+          <div class="subtasks-section">
+            <h4>Subtasks</h4>
+            <div v-for="(subtask, index) in newSubtasks" :key="index" class="subtask-input">
+              <input v-model="subtask.title" type="text" placeholder="Subtask name">
+              <input v-model="subtask.hours" type="number" placeholder="Hours" min="0" step="0.5">
+              <button @click="removeSubtask(index)" class="remove-btn">×</button>
+            </div>
+            <button @click="addSubtask" class="add-subtask-btn">+ Add Subtask</button>
+          </div>
+          
+          <div class="task-actions">
+            <button @click="hideTaskForm" class="cancel-btn">Cancel</button>
+            <button @click="addTask" class="save-btn">Create Task</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -160,7 +171,7 @@ export default {
       expandedTask: { type: null, index: null },
       newTask: '',
       taskDate: '',
-      showingSubtaskForm: false,
+      showingTaskForm: false,
       newSubtasks: [],
       calendarVisible: false,
       currentDate: new Date(),
@@ -364,17 +375,17 @@ export default {
         this.newTask = ''
         this.taskDate = ''
         this.newSubtasks = []
-        this.showingSubtaskForm = false
+        this.showingTaskForm = false
       }
     },
-    showSubtaskForm() {
-      this.showingSubtaskForm = true
-      if (this.newSubtasks.length === 0) {
-        this.addSubtask()
-      }
+    showTaskForm() {
+      this.showingTaskForm = true
+      this.addSubtask()
     },
-    hideSubtaskForm() {
-      this.showingSubtaskForm = false
+    hideTaskForm() {
+      this.showingTaskForm = false
+      this.newTask = ''
+      this.taskDate = ''
       this.newSubtasks = []
     },
     addSubtask() {
@@ -384,7 +395,7 @@ export default {
       this.newSubtasks.splice(index, 1)
     },
     saveSubtasks() {
-      this.showingSubtaskForm = false
+      // Not needed anymore
     },
     completeTask(taskId) {
       const task = this.tasks.find(t => t.id === taskId)
@@ -832,61 +843,88 @@ button:active {
   margin-left: 10px;
 }
 
-.subtask-btn {
+.create-task-btn {
   background: linear-gradient(135deg, #10b981, #059669);
   box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+  font-size: 18px;
+  padding: 14px 24px;
 }
 
-.subtask-btn:hover {
+.create-task-btn:hover {
   background: linear-gradient(135deg, #059669, #047857);
 }
 
-.subtask-form {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 1.5rem;
-  margin: 1rem 0;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-}
-
-.subtask-form h3 {
-  color: white;
-  margin-bottom: 1rem;
-  text-align: center;
-}
-
-.subtask-input {
+.task-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
   display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
-  align-items: center;
-}
-
-.subtask-input input[type="number"] {
-  width: 80px;
-}
-
-.remove-btn {
-  background: #ef4444;
-  padding: 8px 12px;
-  font-size: 16px;
-  min-width: auto;
-}
-
-.add-subtask-btn {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  margin-bottom: 1rem;
-}
-
-.subtask-actions {
-  display: flex;
-  gap: 10px;
   justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
-.subtask-actions button {
-  flex: 1;
-  max-width: 120px;
+.task-modal {
+  background: linear-gradient(135deg, rgb(30, 58, 138), rgb(6, 182, 212));
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  color: white;
+}
+
+.task-header h3 {
+  margin: 0;
+  font-size: 1.5em;
+}
+
+.task-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.task-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 16px;
+}
+
+.subtasks-section h4 {
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.task-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.cancel-btn {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.save-btn {
+  background: linear-gradient(135deg, #10b981, #059669);
 }
 </style>
