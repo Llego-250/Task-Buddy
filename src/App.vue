@@ -199,6 +199,7 @@ export default {
         { 
           id: 1, 
           title: 'Working on final project', 
+          description: 'Developing the main features of the task management application with Vue.js components.',
           dueDate: new Date(2024, 11, 25), 
           createdAt: new Date(2024, 11, 15), 
           completed: false,
@@ -369,6 +370,27 @@ export default {
       } else {
         this.expandedTask = { type, index }
       }
+      this.editingTask = null
+    },
+    toggleEdit(type, index) {
+      const task = this.getTaskByTypeAndIndex(type, index)
+      this.editingTask = { type, index }
+      this.editForm = { ...task }
+    },
+    saveEdit() {
+      const task = this.getTaskByTypeAndIndex(this.editingTask.type, this.editingTask.index)
+      Object.assign(task, this.editForm)
+      this.editingTask = null
+      this.editForm = {}
+    },
+    cancelEdit() {
+      this.editingTask = null
+      this.editForm = {}
+    },
+    getTaskByTypeAndIndex(type, index) {
+      if (type === 'active') return this.visibleActiveTasks[index]
+      if (type === 'completed') return this.visibleCompletedTasks[index]
+      if (type === 'delayed') return this.visibleOverdueTasks[index]
     },
     loadMoreTasks(type) {
       this.visibleTasks[type] += 3
@@ -383,6 +405,7 @@ export default {
           createdAt: new Date(),
           completed: false,
           estimatedHours: totalHours,
+          description: 'Task description',
           subtasks: this.newSubtasks.map((subtask, index) => ({
             id: Date.now() + index,
             title: subtask.title,
