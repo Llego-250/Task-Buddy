@@ -185,6 +185,8 @@ export default {
   data() {
     return {
       expandedTask: { type: null, index: null },
+      editingTask: null,
+      editForm: {},
       newTask: '',
       taskDate: '',
       showingTaskForm: false,
