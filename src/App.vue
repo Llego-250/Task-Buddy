@@ -1269,28 +1269,61 @@ button:active {
 }
 
 .priority-badge {
-  padding: 2px 6px;
-  border-radius: 8px;
+  padding: 3px 8px;
+  border-radius: 12px;
   font-size: 0.7em;
   font-weight: bold;
   margin-right: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.priority-high { background: #ef4444; color: white; }
-.priority-medium { background: #f59e0b; color: white; }
-.priority-low { background: #10b981; color: white; }
+.priority-high { 
+  background: linear-gradient(135deg, #ef4444, #dc2626); 
+  color: white;
+  animation: pulse-high 2s infinite;
+}
+
+.priority-medium { 
+  background: linear-gradient(135deg, #f59e0b, #d97706); 
+  color: white;
+}
+
+.priority-low { 
+  background: linear-gradient(135deg, #10b981, #059669); 
+  color: white;
+}
+
+@keyframes pulse-high {
+  0%, 100% { box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3); }
+  50% { box-shadow: 0 4px 12px rgba(239, 68, 68, 0.6); }
+}
 
 .category-badge {
-  padding: 2px 6px;
-  border-radius: 8px;
+  padding: 3px 8px;
+  border-radius: 12px;
   font-size: 0.7em;
   font-weight: bold;
   margin-right: 0.5rem;
+  text-transform: capitalize;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.category-work { background: #3b82f6; color: white; }
-.category-personal { background: #8b5cf6; color: white; }
-.category-project { background: #f97316; color: white; }
+.category-work { 
+  background: linear-gradient(135deg, #3b82f6, #2563eb); 
+  color: white; 
+}
+
+.category-personal { 
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed); 
+  color: white; 
+}
+
+.category-project { 
+  background: linear-gradient(135deg, #f97316, #ea580c); 
+  color: white; 
+}
 
 .task-actions {
   display: flex;
