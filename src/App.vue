@@ -99,6 +99,16 @@
             <div v-if="editingTask && editingTask.type === 'active' && editingTask.index === index" class="edit-form">
               <input v-model="editForm.title" placeholder="Task title" class="edit-input">
               <textarea v-model="editForm.description" placeholder="Task description" class="edit-textarea"></textarea>
+              <select v-model="editForm.priority" class="edit-select">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+              <select v-model="editForm.category" class="edit-select">
+                <option value="work">Work</option>
+                <option value="personal">Personal</option>
+                <option value="project">Project</option>
+              </select>
               <div class="edit-actions">
                 <button @click.stop="saveEdit" class="save-btn">Save</button>
                 <button @click.stop="cancelEdit" class="cancel-btn">Cancel</button>
