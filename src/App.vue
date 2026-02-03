@@ -214,6 +214,8 @@ export default {
       editForm: {},
       newTask: '',
       taskDate: '',
+      newTaskPriority: 'medium',
+      newTaskCategory: 'work',
       showingTaskForm: false,
       newSubtasks: [],
       calendarVisible: false,
