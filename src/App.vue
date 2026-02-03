@@ -707,6 +707,8 @@ body {
   border-radius: 20px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   padding: 1.5rem;
+  flex: 1;
+  overflow-y: auto;
 }
 .task-item{
   padding: 0.8rem;
