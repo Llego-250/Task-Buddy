@@ -61,10 +61,19 @@
              class="task-item completed-item" 
              @click="toggleTask('completed', index)" 
              :class="{expanded: expandedTask.type === 'completed' && expandedTask.index === index}">
-          {{ task.title }}
-          <div class="task-meta">
-            <span class="task-date">Created: {{ formatDate(task.createdAt) }}</span>
-            <span class="task-hours">{{ task.estimatedHours }}h</span>
+          <div class="task-header">
+            <div class="task-info">
+              <span class="task-title">{{ task.title }}</span>
+              <div class="task-meta">
+                <span class="priority-badge" :class="`priority-${task.priority || 'medium'}`">{{ (task.priority || 'medium').toUpperCase() }}</span>
+                <span class="category-badge" :class="`category-${task.category || 'work'}`">{{ task.category || 'work' }}</span>
+                <span class="task-date">Completed: {{ formatDate(task.createdAt) }}</span>
+                <span class="task-hours">{{ task.estimatedHours }}h</span>
+              </div>
+            </div>
+            <div class="task-actions">
+              <button @click.stop="deleteTask('completed', index)" class="delete-btn" title="Delete Task">🗑️</button>
+            </div>
           </div>
           <div v-if="expandedTask.type === 'completed' && expandedTask.index === index" class="task-description">
             <div class="subtasks">
@@ -100,27 +109,36 @@
               </div>
             </div>
             <div class="task-actions">
-              <button v-if="expandedTask.type === 'active' && expandedTask.index === index" 
-                      @click.stop="toggleEdit('active', index)" class="edit-btn">✏️</button>
-              <button @click.stop="deleteTask('active', index)" class="delete-btn">🗑️</button>
+              <button @click.stop="toggleEdit('active', index)" class="edit-btn" title="Edit Task">✏️</button>
+              <button @click.stop="deleteTask('active', index)" class="delete-btn" title="Delete Task">🗑️</button>
             </div>
           </div>
           <div v-if="expandedTask.type === 'active' && expandedTask.index === index" class="task-description">
             <div v-if="editingTask && editingTask.type === 'active' && editingTask.index === index" class="edit-form">
-              <input v-model="editForm.title" placeholder="Task title" class="edit-input">
+              <input v-model="editForm.title" placeholder="Task title" class="edit-input" required>
               <textarea v-model="editForm.description" placeholder="Task description" class="edit-textarea"></textarea>
+              <input v-model="editForm.dueDate" type="date" class="edit-input">
               <select v-model="editForm.priority" class="edit-select">
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
+                <option value="low">Low Priority</option>
+                <option value="medium">Medium Priority</option>
+                <option value="high">High Priority</option>
               </select>
               <select v-model="editForm.category" class="edit-select">
                 <option value="work">Work</option>
                 <option value="personal">Personal</option>
                 <option value="project">Project</option>
               </select>
+              <div class="subtasks-edit">
+                <h5>Subtasks</h5>
+                <div v-for="(subtask, subIndex) in editForm.subtasks" :key="subtask.id" class="subtask-edit-item">
+                  <input v-model="subtask.title" placeholder="Subtask name" class="subtask-edit-input">
+                  <input v-model.number="subtask.hours" type="number" placeholder="Hours" min="0" step="0.5" class="subtask-hours-input">
+                  <button @click.stop="removeEditSubtask(subIndex)" class="remove-subtask-btn">×</button>
+                </div>
+                <button @click.stop="addEditSubtask" class="add-edit-subtask-btn">+ Add Subtask</button>
+              </div>
               <div class="edit-actions">
-                <button @click.stop="saveEdit" class="save-btn">Save</button>
+                <button @click.stop="saveEdit" class="save-btn">Save Changes</button>
                 <button @click.stop="cancelEdit" class="cancel-btn">Cancel</button>
               </div>
             </div>
@@ -150,20 +168,51 @@
              class="task-item delayed-item" 
              @click="toggleTask('delayed', index)" 
              :class="{expanded: expandedTask.type === 'delayed' && expandedTask.index === index}">
-          {{ task.title }}
-          <div class="task-meta">
-            <span class="task-date">Due: {{ formatDate(task.dueDate) }}</span>
-            <span class="task-hours">{{ task.estimatedHours }}h</span>
-          </div>
-          <div v-if="expandedTask.type === 'delayed' && expandedTask.index === index" class="task-description">
-            <div class="subtasks">
-              <div v-for="subtask in task.subtasks" :key="subtask.id" class="subtask-item">
-                <input type="checkbox" v-model="subtask.completed" @click.stop>
-                <span :class="{ 'completed': subtask.completed }">{{ subtask.title }}</span>
-                <span class="subtask-hours">{{ subtask.hours }}h</span>
+          <div class="task-header">
+            <div class="task-info">
+              <span class="task-title">{{ task.title }}</span>
+              <div class="task-meta">
+                <span class="priority-badge" :class="`priority-${task.priority || 'medium'}`">{{ (task.priority || 'medium').toUpperCase() }}</span>
+                <span class="category-badge" :class="`category-${task.category || 'work'}`">{{ task.category || 'work' }}</span>
+                <span class="task-date overdue-date">Due: {{ formatDate(task.dueDate) }}</span>
+                <span class="task-hours">{{ task.estimatedHours }}h</span>
               </div>
             </div>
-            <button @click.stop="completeTask(task.id)" class="complete-btn">✓</button>
+            <div class="task-actions">
+              <button @click.stop="toggleEdit('delayed', index)" class="edit-btn" title="Edit Task">✏️</button>
+              <button @click.stop="deleteTask('delayed', index)" class="delete-btn" title="Delete Task">🗑️</button>
+            </div>
+          </div>
+          <div v-if="expandedTask.type === 'delayed' && expandedTask.index === index" class="task-description">
+            <div v-if="editingTask && editingTask.type === 'delayed' && editingTask.index === index" class="edit-form">
+              <input v-model="editForm.title" placeholder="Task title" class="edit-input" required>
+              <textarea v-model="editForm.description" placeholder="Task description" class="edit-textarea"></textarea>
+              <input v-model="editForm.dueDate" type="date" class="edit-input">
+              <select v-model="editForm.priority" class="edit-select">
+                <option value="low">Low Priority</option>
+                <option value="medium">Medium Priority</option>
+                <option value="high">High Priority</option>
+              </select>
+              <select v-model="editForm.category" class="edit-select">
+                <option value="work">Work</option>
+                <option value="personal">Personal</option>
+                <option value="project">Project</option>
+              </select>
+              <div class="edit-actions">
+                <button @click.stop="saveEdit" class="save-btn">Save Changes</button>
+                <button @click.stop="cancelEdit" class="cancel-btn">Cancel</button>
+              </div>
+            </div>
+            <div v-else>
+              <div class="subtasks">
+                <div v-for="subtask in task.subtasks" :key="subtask.id" class="subtask-item">
+                  <input type="checkbox" v-model="subtask.completed" @click.stop>
+                  <span :class="{ 'completed': subtask.completed }">{{ subtask.title }}</span>
+                  <span class="subtask-hours">{{ subtask.hours }}h</span>
+                </div>
+              </div>
+              <button @click.stop="completeTask(task.id)" class="complete-btn">✓</button>
+            </div>
           </div>
         </div>
         <button v-if="overdueTasks.length > visibleTasks.overdue" 
@@ -404,13 +453,37 @@ export default {
     toggleEdit(type, index) {
       const task = this.getTaskByTypeAndIndex(type, index)
       this.editingTask = { type, index }
-      this.editForm = { ...task }
+      this.editForm = { 
+        ...task, 
+        dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
+        subtasks: [...task.subtasks]
+      }
     },
     saveEdit() {
+      if (!this.editForm.title.trim()) {
+        alert('Task title is required!')
+        return
+      }
       const task = this.getTaskByTypeAndIndex(this.editingTask.type, this.editingTask.index)
-      Object.assign(task, this.editForm)
+      const updatedTask = {
+        ...this.editForm,
+        dueDate: new Date(this.editForm.dueDate),
+        estimatedHours: this.editForm.subtasks.reduce((sum, subtask) => sum + (parseFloat(subtask.hours) || 0), 0)
+      }
+      Object.assign(task, updatedTask)
       this.editingTask = null
       this.editForm = {}
+    },
+    addEditSubtask() {
+      this.editForm.subtasks.push({
+        id: Date.now() + Math.random(),
+        title: '',
+        completed: false,
+        hours: 1
+      })
+    },
+    removeEditSubtask(index) {
+      this.editForm.subtasks.splice(index, 1)
     },
     cancelEdit() {
       this.editingTask = null
@@ -422,15 +495,24 @@ export default {
       if (type === 'delayed') return this.visibleOverdueTasks[index]
     },
     deleteTask(type, index) {
-      if (confirm('Are you sure you want to delete this task?')) {
-        const taskArrays = {
-          active: this.tasks.filter(t => !t.completed && new Date(t.dueDate) >= new Date().setHours(0,0,0,0)),
-          completed: this.tasks.filter(t => t.completed),
-          delayed: this.tasks.filter(t => !t.completed && new Date(t.dueDate) < new Date().setHours(0,0,0,0))
-        }
-        const taskToDelete = taskArrays[type][index]
-        this.tasks = this.tasks.filter(t => t.id !== taskToDelete.id)
+      const task = this.getTaskByTypeAndIndex(type, index)
+      const taskTitle = task.title
+      
+      if (confirm(`Are you sure you want to permanently delete "${taskTitle}"?\n\nThis action cannot be undone.`)) {
+        this.tasks = this.tasks.filter(t => t.id !== task.id)
         this.expandedTask = { type: null, index: null }
+        this.editingTask = null
+        
+        // Show success notification
+        this.notifications.push({
+          id: Date.now(),
+          message: `Task "${taskTitle}" has been deleted successfully`
+        })
+        
+        // Auto-dismiss notification after 3 seconds
+        setTimeout(() => {
+          this.notifications = this.notifications.filter(n => n.id !== Date.now())
+        }, 3000)
       }
     },
     loadMoreTasks(type) {
