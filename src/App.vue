@@ -79,20 +79,36 @@
              class="task-item" 
              @click="toggleTask('active', index)" 
              :class="{expanded: expandedTask.type === 'active' && expandedTask.index === index}">
-          {{ task.title }}
-          <div class="task-meta">
-            <span class="task-date">Due: {{ formatDate(task.dueDate) }}</span>
-            <span class="task-hours">{{ task.estimatedHours }}h</span>
-          </div>
-          <div v-if="expandedTask.type === 'active' && expandedTask.index === index" class="task-description">
-            <div class="subtasks">
-              <div v-for="subtask in task.subtasks" :key="subtask.id" class="subtask-item">
-                <input type="checkbox" v-model="subtask.completed" @click.stop>
-                <span :class="{ 'completed': subtask.completed }">{{ subtask.title }}</span>
-                <span class="subtask-hours">{{ subtask.hours }}h</span>
+          <div class="task-header">
+            <div class="task-info">
+              <span class="task-title">{{ task.title }}</span>
+              <div class="task-meta">
+                <span class="task-date">Due: {{ formatDate(task.dueDate) }}</span>
+                <span class="task-hours">{{ task.estimatedHours }}h</span>
               </div>
             </div>
-            <button @click.stop="completeTask(task.id)" class="complete-btn">✓</button>
+            <button v-if="expandedTask.type === 'active' && expandedTask.index === index" 
+                    @click.stop="toggleEdit('active', index)" class="edit-btn">✏️</button>
+          </div>
+          <div v-if="expandedTask.type === 'active' && expandedTask.index === index" class="task-description">
+            <div v-if="editingTask && editingTask.type === 'active' && editingTask.index === index" class="edit-form">
+              <input v-model="editForm.title" placeholder="Task title" class="edit-input">
+              <textarea v-model="editForm.description" placeholder="Task description" class="edit-textarea"></textarea>
+              <div class="edit-actions">
+                <button @click.stop="saveEdit" class="save-btn">Save</button>
+                <button @click.stop="cancelEdit" class="cancel-btn">Cancel</button>
+              </div>
+            </div>
+            <div v-else>
+              <div class="subtasks">
+                <div v-for="subtask in task.subtasks" :key="subtask.id" class="subtask-item">
+                  <input type="checkbox" v-model="subtask.completed" @click.stop>
+                  <span :class="{ 'completed': subtask.completed }">{{ subtask.title }}</span>
+                  <span class="subtask-hours">{{ subtask.hours }}h</span>
+                </div>
+              </div>
+              <button @click.stop="completeTask(task.id)" class="complete-btn">✓</button>
+            </div>
           </div>
         </div>
         <button v-if="activeTasks.length > visibleTasks.active" 
