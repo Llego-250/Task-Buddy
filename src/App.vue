@@ -227,6 +227,8 @@ export default {
           id: 1, 
           title: 'Working on final project', 
           description: 'Developing the main features of the task management application with Vue.js components.',
+          priority: 'high',
+          category: 'project',
           dueDate: new Date(2024, 11, 25), 
           createdAt: new Date(2024, 11, 15), 
           completed: false,
@@ -419,6 +421,18 @@ export default {
       if (type === 'completed') return this.visibleCompletedTasks[index]
       if (type === 'delayed') return this.visibleOverdueTasks[index]
     },
+    deleteTask(type, index) {
+      if (confirm('Are you sure you want to delete this task?')) {
+        const taskArrays = {
+          active: this.tasks.filter(t => !t.completed && new Date(t.dueDate) >= new Date().setHours(0,0,0,0)),
+          completed: this.tasks.filter(t => t.completed),
+          delayed: this.tasks.filter(t => !t.completed && new Date(t.dueDate) < new Date().setHours(0,0,0,0))
+        }
+        const taskToDelete = taskArrays[type][index]
+        this.tasks = this.tasks.filter(t => t.id !== taskToDelete.id)
+        this.expandedTask = { type: null, index: null }
+      }
+    },
     loadMoreTasks(type) {
       this.visibleTasks[type] += 3
     },
@@ -433,6 +447,8 @@ export default {
           completed: false,
           estimatedHours: totalHours,
           description: 'Task description',
+          priority: this.newTaskPriority,
+          category: this.newTaskCategory,
           subtasks: this.newSubtasks.map((subtask, index) => ({
             id: Date.now() + index,
             title: subtask.title,
