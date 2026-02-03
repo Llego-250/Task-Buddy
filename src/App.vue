@@ -683,6 +683,9 @@ body {
   border-radius: 20px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 .card.completed {
   background: linear-gradient(rgb(34, 197, 94), rgba(82, 108, 96, 0.299), rgb(21, 128, 61));
@@ -704,6 +707,8 @@ body {
   border-radius: 20px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   padding: 1.5rem;
+  flex: 1;
+  overflow-y: auto;
 }
 .task-item{
   padding: 0.8rem;
