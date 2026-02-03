@@ -83,12 +83,17 @@
             <div class="task-info">
               <span class="task-title">{{ task.title }}</span>
               <div class="task-meta">
+                <span class="priority-badge" :class="`priority-${task.priority || 'medium'}`">{{ (task.priority || 'medium').toUpperCase() }}</span>
+                <span class="category-badge" :class="`category-${task.category || 'work'}`">{{ task.category || 'work' }}</span>
                 <span class="task-date">Due: {{ formatDate(task.dueDate) }}</span>
                 <span class="task-hours">{{ task.estimatedHours }}h</span>
               </div>
             </div>
-            <button v-if="expandedTask.type === 'active' && expandedTask.index === index" 
-                    @click.stop="toggleEdit('active', index)" class="edit-btn">✏️</button>
+            <div class="task-actions">
+              <button v-if="expandedTask.type === 'active' && expandedTask.index === index" 
+                      @click.stop="toggleEdit('active', index)" class="edit-btn">✏️</button>
+              <button @click.stop="deleteTask('active', index)" class="delete-btn">🗑️</button>
+            </div>
           </div>
           <div v-if="expandedTask.type === 'active' && expandedTask.index === index" class="task-description">
             <div v-if="editingTask && editingTask.type === 'active' && editingTask.index === index" class="edit-form">
