@@ -670,11 +670,10 @@ body {
   flex: 1;
   display: flex;
   justify-content: space-between;
-  align-items: stretch;
+  align-items: flex-start;
   gap: 2rem;
   max-width: 1400px;
   margin: 0 auto;
-  height: calc(100vh - 300px);
 }
 .card{
   flex: 1;
