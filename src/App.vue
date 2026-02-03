@@ -1185,4 +1185,53 @@ button:active {
   display: flex;
   gap: 0.5rem;
 }
+
+.priority-badge {
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 0.7em;
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.priority-high { background: #ef4444; color: white; }
+.priority-medium { background: #f59e0b; color: white; }
+.priority-low { background: #10b981; color: white; }
+
+.category-badge {
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 0.7em;
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.category-work { background: #3b82f6; color: white; }
+.category-personal { background: #8b5cf6; color: white; }
+.category-project { background: #f97316; color: white; }
+
+.task-actions {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.delete-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 14px;
+  cursor: pointer;
+  margin: 0;
+}
+
+.edit-select {
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 14px;
+}
 </style>
