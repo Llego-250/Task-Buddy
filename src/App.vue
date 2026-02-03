@@ -23,6 +23,16 @@
         <div class="task-form">
           <input v-model="newTask" type="text" placeholder="Task name" class="task-input">
           <input v-model="taskDate" type="date" class="task-input">
+          <select v-model="newTaskPriority" class="task-input">
+            <option value="low">Low Priority</option>
+            <option value="medium">Medium Priority</option>
+            <option value="high">High Priority</option>
+          </select>
+          <select v-model="newTaskCategory" class="task-input">
+            <option value="work">Work</option>
+            <option value="personal">Personal</option>
+            <option value="project">Project</option>
+          </select>
           
           <div class="subtasks-section">
             <h4>Subtasks</h4>
