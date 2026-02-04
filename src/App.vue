@@ -1682,6 +1682,24 @@ button:active {
   transform: scale(1.1);
 }
 
+.reports-btn {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: all 0.3s ease;
+}
+
+.reports-btn:hover {
+  background: linear-gradient(135deg, #d97706, #b45309);
+  transform: scale(1.1);
+}
+
 /* Accessibility improvements */
 *:focus {
   outline: 2px solid var(--accent-color);
