@@ -311,6 +311,8 @@ export default {
           createdAt: new Date(2024, 11, 10), 
           completed: false,
           estimatedHours: 6,
+          recurring: { enabled: false, type: 'daily', interval: 1 },
+          dependencies: [],
           subtasks: [
             { id: 21, title: 'Review chapters 1-5', completed: false, hours: 3 },
             { id: 22, title: 'Practice problems', completed: false, hours: 2 },
