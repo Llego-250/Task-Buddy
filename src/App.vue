@@ -936,10 +936,13 @@ body {
 .card{
   flex: 1;
   min-width: 300px;
-  background: linear-gradient(rgb(20, 209, 211), rgba(82, 108, 96, 0.299),rgb(14, 10, 111));
+  background: var(--bg-secondary);
   border-radius: 20px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   padding: 2rem;
+  color: var(--text-primary);
+  backdrop-filter: blur(20px);
+  border: 2px solid var(--border-color);
 }
 .card.completed {
   background: linear-gradient(rgb(34, 197, 94), rgba(82, 108, 96, 0.299), rgb(21, 128, 61));
