@@ -767,6 +767,21 @@ export default {
         const task = this.tasks.find(t => t.id === id)
         if (task) task.category = category
       })
+    },
+    
+    handleTaskSelected(task) {
+      // Find and expand the selected task
+      const activeIndex = this.activeTasks.findIndex(t => t.id === task.id)
+      const completedIndex = this.completedTasks.findIndex(t => t.id === task.id)
+      const overdueIndex = this.overdueTasks.findIndex(t => t.id === task.id)
+      
+      if (activeIndex !== -1) {
+        this.expandedTask = { type: 'active', index: activeIndex }
+      } else if (completedIndex !== -1) {
+        this.expandedTask = { type: 'completed', index: completedIndex }
+      } else if (overdueIndex !== -1) {
+        this.expandedTask = { type: 'delayed', index: overdueIndex }
+      }
     }
   },
   mounted() {
