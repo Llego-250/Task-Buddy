@@ -20,6 +20,9 @@
       <button @click="showAnalytics = true" class="analytics-btn" title="Analytics Dashboard">
         📈
       </button>
+      <button @click="showNotificationsDemo = true" class="demo-btn" title="Notifications Demo">
+        🔔
+      </button>
     </div>
 
     <!-- Task Creation Modal -->
@@ -366,6 +369,12 @@
   :tasks="tasks"
   @hide-dashboard="showAnalytics = false"
 />
+<NotificationsDemo 
+  v-if="showNotificationsDemo"
+  @demo-action="handleDemoAction"
+  @create-notification="handleDemoNotification"
+  @close="showNotificationsDemo = false"
+/>
 </template>
 
 <script>
@@ -383,6 +392,7 @@ import SearchFilter from './components/SearchFilter.vue'
 import AnalyticsDashboard from './components/AnalyticsDashboard.vue'
 import EnhancedNotifications from './components/EnhancedNotifications.vue'
 import CustomReminders from './components/CustomReminders.vue'
+import NotificationsDemo from './components/NotificationsDemo.vue'
 
 export default {
   components: {
@@ -399,7 +409,8 @@ export default {
     SearchFilter,
     AnalyticsDashboard,
     EnhancedNotifications,
-    CustomReminders
+    CustomReminders,
+    NotificationsDemo
   },
   data() {
     return {
@@ -421,6 +432,7 @@ export default {
       showTimeReports: false,
       filteredTasks: [],
       showAnalytics: false,
+      showNotificationsDemo: false,
       calendarVisible: false,
       currentDate: new Date(),
       notifications: [],
@@ -870,6 +882,21 @@ export default {
     handleNotificationSettings(settings) {
       this.notificationSettings = settings
       localStorage.setItem('notificationSettings', JSON.stringify(settings))
+    },
+    
+    handleDemoAction(message) {
+      this.notifications.push({
+        id: Date.now(),
+        message: `Demo: ${message}`
+      })
+      setTimeout(() => {
+        this.notifications = this.notifications.filter(n => n.id !== Date.now())
+      }, 3000)
+    },
+    
+    handleDemoNotification(notification) {
+      // This would be handled by the EnhancedNotifications component
+      console.log('Demo notification created:', notification)
     }
   },
   mounted() {
