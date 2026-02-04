@@ -346,13 +346,13 @@
 />
 <TaskSearch 
   :show-search="showSearch"
-  :tasks="tasks"
+  :tasks="filteredTasks.length ? filteredTasks : tasks"
   @hide-search="showSearch = false"
   @task-selected="handleTaskSelected"
 />
 <TimeReports 
   :show-reports="showTimeReports"
-  :tasks="tasks"
+  :tasks="filteredTasks.length ? filteredTasks : tasks"
   @hide-reports="showTimeReports = false"
 />
 </template>
