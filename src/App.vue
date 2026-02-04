@@ -44,6 +44,14 @@
             <button @click="addSubtask" class="add-subtask-btn">+ Add Subtask</button>
           </div>
           
+          <RecurringTasks v-model="newRecurring" />
+          
+          <TaskDependencies 
+            v-model="newDependencies" 
+            :available-tasks="activeTasks" 
+            :current-task-id="null"
+          />
+          
           <div class="task-actions">
             <button @click="hideTaskForm" class="cancel-btn">Cancel</button>
             <button @click="addTask" class="save-btn">Create Task</button>
