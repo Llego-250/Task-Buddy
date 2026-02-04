@@ -818,6 +818,13 @@ export default {
       } else if (overdueIndex !== -1) {
         this.expandedTask = { type: 'delayed', index: overdueIndex }
       }
+    },
+    
+    updateTaskTime({ taskId, time }) {
+      const task = this.tasks.find(t => t.id === taskId)
+      if (task) {
+        task.actualSeconds = time
+      }
     }
   },
   mounted() {
