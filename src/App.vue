@@ -394,6 +394,7 @@ export default {
           createdAt: new Date(2024, 11, 15), 
           completed: false,
           estimatedHours: 8,
+          actualSeconds: 0,
           recurring: { enabled: false, type: 'daily', interval: 1 },
           dependencies: [],
           subtasks: [
