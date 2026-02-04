@@ -61,6 +61,11 @@
             :current-task-id="null"
           />
           
+          <CustomReminders 
+            v-model="newCustomReminders"
+            :task-due-date="taskDate"
+          />
+          
           <div class="task-actions">
             <button @click="hideTaskForm" class="cancel-btn">Cancel</button>
             <button @click="addTask" class="save-btn">Create Task</button>
@@ -377,6 +382,7 @@ import TimeReports from './components/TimeReports.vue'
 import SearchFilter from './components/SearchFilter.vue'
 import AnalyticsDashboard from './components/AnalyticsDashboard.vue'
 import EnhancedNotifications from './components/EnhancedNotifications.vue'
+import CustomReminders from './components/CustomReminders.vue'
 
 export default {
   components: {
@@ -392,7 +398,8 @@ export default {
     TimeReports,
     SearchFilter,
     AnalyticsDashboard,
-    EnhancedNotifications
+    EnhancedNotifications,
+    CustomReminders
   },
   data() {
     return {
@@ -407,6 +414,7 @@ export default {
       newSubtasks: [],
       newRecurring: { enabled: false, type: 'daily', interval: 1 },
       newDependencies: [],
+      newCustomReminders: [],
       bulkMode: false,
       showShortcutsHelp: false,
       showSearch: false,
@@ -693,6 +701,7 @@ export default {
           category: this.newTaskCategory,
           recurring: this.newRecurring,
           dependencies: this.newDependencies,
+          customReminders: this.newCustomReminders,
           subtasks: this.newSubtasks.map((subtask, index) => ({
             id: Date.now() + index,
             title: subtask.title,
@@ -713,6 +722,7 @@ export default {
         this.newSubtasks = []
         this.newRecurring = { enabled: false, type: 'daily', interval: 1 }
         this.newDependencies = []
+        this.newCustomReminders = []
         this.showingTaskForm = false
       }
     },
@@ -725,6 +735,7 @@ export default {
       this.newTask = ''
       this.taskDate = ''
       this.newSubtasks = []
+      this.newCustomReminders = []
     },
     addSubtask() {
       this.newSubtasks.push({ title: '', hours: 1 })
