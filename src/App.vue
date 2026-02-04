@@ -345,6 +345,9 @@ import BulkActions from './components/BulkActions.vue'
 import ThemeToggle from './components/ThemeToggle.vue'
 import KeyboardShortcuts from './components/KeyboardShortcuts.vue'
 import TaskSearch from './components/TaskSearch.vue'
+import TimeTracker from './components/TimeTracker.vue'
+import ProgressBar from './components/ProgressBar.vue'
+import TimeReports from './components/TimeReports.vue'
 
 export default {
   components: {
@@ -354,7 +357,10 @@ export default {
     BulkActions,
     ThemeToggle,
     KeyboardShortcuts,
-    TaskSearch
+    TaskSearch,
+    TimeTracker,
+    ProgressBar,
+    TimeReports
   },
   data() {
     return {
