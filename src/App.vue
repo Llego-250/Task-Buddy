@@ -255,7 +255,18 @@
 </template>
 
 <script>
+import RecurringTasks from './components/RecurringTasks.vue'
+import TaskDependencies from './components/TaskDependencies.vue'
+import DragDropTasks from './components/DragDropTasks.vue'
+import BulkActions from './components/BulkActions.vue'
+
 export default {
+  components: {
+    RecurringTasks,
+    TaskDependencies,
+    DragDropTasks,
+    BulkActions
+  },
   data() {
     return {
       expandedTask: { type: null, index: null },
@@ -267,6 +278,9 @@ export default {
       newTaskCategory: 'work',
       showingTaskForm: false,
       newSubtasks: [],
+      newRecurring: { enabled: false, type: 'daily', interval: 1 },
+      newDependencies: [],
+      bulkMode: false,
       calendarVisible: false,
       currentDate: new Date(),
       notifications: [],
