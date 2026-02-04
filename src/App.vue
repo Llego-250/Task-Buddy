@@ -383,7 +383,8 @@ export default {
     TimeTracker,
     ProgressBar,
     TimeReports,
-    SearchFilter
+    SearchFilter,
+    AnalyticsDashboard
   },
   data() {
     return {
@@ -403,6 +404,7 @@ export default {
       showSearch: false,
       showTimeReports: false,
       filteredTasks: [],
+      showAnalytics: false,
       calendarVisible: false,
       currentDate: new Date(),
       notifications: [],
