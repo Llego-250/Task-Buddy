@@ -67,9 +67,9 @@
     </div>
   </div>
 
+  <SearchFilter :tasks="tasks" @filtered-tasks="handleFilteredTasks" />
+
   <div class="card-container">
-    <SearchFilter :tasks="tasks" @filtered-tasks="handleFilteredTasks" />
-    
     <div class="card completed">
       <div class="card-title">Completed Tasks</div>
       <div class="task">
