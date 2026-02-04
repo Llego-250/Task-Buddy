@@ -592,7 +592,7 @@ export default {
     addTask() {
       if (this.newTask.trim() && this.taskDate) {
         const totalHours = this.newSubtasks.reduce((sum, subtask) => sum + (parseFloat(subtask.hours) || 0), 0)
-        this.tasks.push({
+        const newTask = {
           id: Date.now(),
           title: this.newTask,
           dueDate: new Date(this.taskDate),
@@ -602,16 +602,28 @@ export default {
           description: 'Task description',
           priority: this.newTaskPriority,
           category: this.newTaskCategory,
+          recurring: this.newRecurring,
+          dependencies: this.newDependencies,
           subtasks: this.newSubtasks.map((subtask, index) => ({
             id: Date.now() + index,
             title: subtask.title,
             completed: false,
             hours: parseFloat(subtask.hours) || 0
           }))
-        })
+        }
+        
+        this.tasks.push(newTask)
+        
+        // Handle recurring task creation
+        if (this.newRecurring.enabled) {
+          this.createRecurringTasks(newTask)
+        }
+        
         this.newTask = ''
         this.taskDate = ''
         this.newSubtasks = []
+        this.newRecurring = { enabled: false, type: 'daily', interval: 1 }
+        this.newDependencies = []
         this.showingTaskForm = false
       }
     },
