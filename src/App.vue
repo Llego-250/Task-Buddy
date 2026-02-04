@@ -677,6 +677,68 @@ export default {
     },
     dismissNotification(id) {
       this.notifications = this.notifications.filter(n => n.id !== id)
+    },
+    
+    // Advanced Features Methods
+    createRecurringTasks(baseTask) {
+      const { type, interval } = baseTask.recurring
+      const baseDate = new Date(baseTask.dueDate)
+      
+      for (let i = 1; i <= 5; i++) { // Create 5 recurring instances
+        const newDate = new Date(baseDate)
+        if (type === 'daily') {
+          newDate.setDate(baseDate.getDate() + (i * interval))
+        } else if (type === 'weekly') {
+          newDate.setDate(baseDate.getDate() + (i * interval * 7))
+        } else if (type === 'monthly') {
+          newDate.setMonth(baseDate.getMonth() + (i * interval))
+        }
+        
+        this.tasks.push({
+          ...baseTask,
+          id: Date.now() + i,
+          dueDate: newDate,
+          createdAt: new Date()
+        })
+      }
+    },
+    
+    handleReorder({ from, to, category }) {
+      const tasks = category === 'active' ? this.activeTasks : 
+                   category === 'completed' ? this.completedTasks : this.overdueTasks
+      const [movedTask] = tasks.splice(from, 1)
+      tasks.splice(to, 0, movedTask)
+    },
+    
+    handleMoveCategory({ task, fromCategory, toCategory, toIndex }) {
+      // Update task category based on destination
+      if (toCategory === 'completed') {
+        task.completed = true
+      } else {
+        task.completed = false
+        // Adjust due date if moving to active from overdue
+        if (fromCategory === 'overdue' && toCategory === 'active') {
+          task.dueDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days from now
+        }
+      }
+    },
+    
+    handleBulkComplete(taskIds) {
+      taskIds.forEach(id => {
+        const task = this.tasks.find(t => t.id === id)
+        if (task) task.completed = true
+      })
+    },
+    
+    handleBulkDelete(taskIds) {
+      this.tasks = this.tasks.filter(task => !taskIds.includes(task.id))
+    },
+    
+    handleBulkCategoryChange({ taskIds, category }) {
+      taskIds.forEach(id => {
+        const task = this.tasks.find(t => t.id === id)
+        if (task) task.category = category
+      })
     }
   },
   mounted() {
