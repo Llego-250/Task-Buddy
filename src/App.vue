@@ -151,7 +151,17 @@
           @move-category="handleMoveCategory"
         >
           <template #default="{ task, index }">
-            <div class="task-item" @click="toggleTask('active', index)" :class="{expanded: expandedTask.type === 'active' && expandedTask.index === index}">
+            <div 
+              class="task-item" 
+              @click="toggleTask('active', index)" 
+              :class="{expanded: expandedTask.type === 'active' && expandedTask.index === index}"
+              tabindex="0"
+              @keydown.enter="toggleTask('active', index)"
+              @keydown.space.prevent="toggleTask('active', index)"
+              role="button"
+              :aria-expanded="expandedTask.type === 'active' && expandedTask.index === index"
+              :aria-label=`Task: ${task.title}, Priority: ${task.priority}, Due: ${formatDate(task.dueDate)}`
+            >
               <div class="task-header">
                 <div class="task-info">
                   <span class="task-title">{{ task.title }}</span>
