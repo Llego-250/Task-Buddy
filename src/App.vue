@@ -833,6 +833,10 @@ export default {
       if (task) {
         task.actualSeconds = time
       }
+    },
+    
+    handleFilteredTasks(filtered) {
+      this.filteredTasks = filtered
     }
   },
   mounted() {
