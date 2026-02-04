@@ -816,6 +816,27 @@ export default {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Theme Variables */
+:root[data-theme="light"] {
+  --bg-primary: linear-gradient(135deg, #e0f2fe, #b3e5fc);
+  --bg-secondary: rgba(255, 255, 255, 0.9);
+  --bg-hover: rgba(0, 0, 0, 0.1);
+  --text-primary: #1a1a1a;
+  --text-secondary: #666;
+  --border-color: rgba(0, 0, 0, 0.2);
+  --accent-color: #2196f3;
+}
+
+:root[data-theme="dark"] {
+  --bg-primary: linear-gradient(135deg, rgb(30, 58, 138), rgb(6, 182, 212));
+  --bg-secondary: rgba(255, 255, 255, 0.1);
+  --bg-hover: rgba(255, 255, 255, 0.2);
+  --text-primary: rgba(255, 255, 255, 0.87);
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --border-color: rgba(255, 255, 255, 0.3);
+  --accent-color: #64b5f6;
+}
+
 body {
   font-family: Arial, sans-serif;
   margin: 0px;
