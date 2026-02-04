@@ -210,6 +210,16 @@
                   </div>
                 </div>
                 <div v-else>
+                  <ProgressBar 
+                    :subtasks="task.subtasks" 
+                    :estimated-hours="task.estimatedHours"
+                    :actual-seconds="task.actualSeconds || 0"
+                  />
+                  <TimeTracker 
+                    :task-id="task.id"
+                    :initial-time="task.actualSeconds || 0"
+                    @time-update="updateTaskTime"
+                  />
                   <div class="subtasks">
                     <div v-for="subtask in task.subtasks" :key="subtask.id" class="subtask-item">
                       <input type="checkbox" v-model="subtask.completed" @click.stop>
@@ -337,6 +347,11 @@
   :tasks="tasks"
   @hide-search="showSearch = false"
   @task-selected="handleTaskSelected"
+/>
+<TimeReports 
+  :show-reports="showTimeReports"
+  :tasks="tasks"
+  @hide-reports="showTimeReports = false"
 />
 </template>
 
