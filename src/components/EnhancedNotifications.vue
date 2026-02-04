@@ -74,6 +74,8 @@
 </template>
 
 <script>
+import NotificationService from '../services/NotificationService.js'
+
 export default {
   name: 'EnhancedNotifications',
   props: {
@@ -104,11 +106,15 @@ export default {
     this.initAudio()
     this.startNotificationCheck()
     this.setupCustomReminders()
+    
+    // Listen for custom reminder events
+    window.addEventListener('taskReminder', this.handleCustomReminder)
   },
   beforeUnmount() {
     if (this.checkInterval) {
       clearInterval(this.checkInterval)
     }
+    window.removeEventListener('taskReminder', this.handleCustomReminder)
   },
   watch: {
     tasks: {
@@ -127,6 +133,7 @@ export default {
     },
     saveSettings() {
       localStorage.setItem('notificationSettings', JSON.stringify(this.settings))
+      NotificationService.saveSettings(this.settings)
       this.showSettings = false
       this.$emit('settings-updated', this.settings)
     },
@@ -189,15 +196,17 @@ export default {
         }
       })
     },
-    createNotification(task, type) {
+    createNotification(task, type, customMessage = null) {
       const notification = {
         id: Date.now() + Math.random(),
         taskId: task.id,
         type,
         title: task.title,
-        message: type === 'reminder' 
+        message: customMessage || (type === 'reminder' 
           ? `Due in ${this.settings.defaultReminder} minutes`
-          : 'Task is overdue!',
+          : type === 'overdue' 
+          ? 'Task is overdue!'
+          : customMessage),
         dueTime: task.dueDate,
         priority: task.priority || 'medium',
         createdAt: new Date()
@@ -268,17 +277,17 @@ export default {
       this.activeNotifications = this.activeNotifications.filter(n => n.id !== id)
     },
     setupCustomReminders() {
-      // Allow users to set custom reminder times for specific tasks
+      // Setup custom reminders using the notification service
       this.tasks.forEach(task => {
-        if (task.customReminders) {
+        if (task.customReminders && task.customReminders.length > 0) {
           task.customReminders.forEach(reminder => {
             const reminderTime = new Date(reminder.time)
             if (reminderTime > new Date()) {
-              this.customReminders.set(`${task.id}-${reminder.id}`, {
-                taskId: task.id,
-                time: reminderTime,
-                message: reminder.message || `Custom reminder for ${task.title}`
-              })
+              NotificationService.setCustomReminder(
+                task.id,
+                reminderTime,
+                reminder.message || `Reminder: ${task.title}`
+              )
             }
           })
         }
@@ -286,6 +295,14 @@ export default {
     },
     formatTime(dateTime) {
       return new Date(dateTime).toLocaleString()
+    },
+    handleCustomReminder(event) {
+      const reminder = event.detail
+      const task = this.tasks.find(t => t.id === reminder.taskId)
+      
+      if (task) {
+        this.createNotification(task, 'custom', reminder.message)
+      }
     },
     requestNotificationPermission() {
       if ('Notification' in window && Notification.permission === 'default') {
