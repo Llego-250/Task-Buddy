@@ -186,7 +186,8 @@ export default {
 }
 
 .search-input {
-  flex: 1;
+  flex: none;
+  width: 300px;
   padding: 8px 12px;
   border: 1px solid var(--border-color);
   border-radius: 6px;
