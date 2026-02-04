@@ -378,6 +378,7 @@ export default {
       bulkMode: false,
       showShortcutsHelp: false,
       showSearch: false,
+      showTimeReports: false,
       calendarVisible: false,
       currentDate: new Date(),
       notifications: [],
