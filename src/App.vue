@@ -14,6 +14,9 @@
       <button @click="showShortcutsHelp = true" class="help-btn" title="Keyboard Shortcuts (?)">
         ?
       </button>
+      <button @click="showTimeReports = true" class="reports-btn" title="Time Reports">
+        📊
+      </button>
     </div>
 
     <!-- Task Creation Modal -->
