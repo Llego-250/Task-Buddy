@@ -366,6 +366,7 @@ import TaskSearch from './components/TaskSearch.vue'
 import TimeTracker from './components/TimeTracker.vue'
 import ProgressBar from './components/ProgressBar.vue'
 import TimeReports from './components/TimeReports.vue'
+import SearchFilter from './components/SearchFilter.vue'
 
 export default {
   components: {
@@ -378,7 +379,8 @@ export default {
     TaskSearch,
     TimeTracker,
     ProgressBar,
-    TimeReports
+    TimeReports,
+    SearchFilter
   },
   data() {
     return {
