@@ -308,6 +308,23 @@
     <button @click="dismissNotification(notification.id)">×</button>
   </div>
 </div>
+
+<!-- UI/UX Enhancement Components -->
+<ThemeToggle />
+<KeyboardShortcuts 
+  :show-help="showShortcutsHelp"
+  @hide-help="showShortcutsHelp = false"
+  @new-task="showTaskForm"
+  @search="showSearch = true"
+  @bulk-toggle="bulkMode = !bulkMode"
+  @theme-toggle="$refs.themeToggle?.toggleTheme()"
+/>
+<TaskSearch 
+  :show-search="showSearch"
+  :tasks="tasks"
+  @hide-search="showSearch = false"
+  @task-selected="handleTaskSelected"
+/>
 </template>
 
 <script>
