@@ -160,7 +160,7 @@
               @keydown.space.prevent="toggleTask('active', index)"
               role="button"
               :aria-expanded="expandedTask.type === 'active' && expandedTask.index === index"
-              :aria-label=`Task: ${task.title}, Priority: ${task.priority}, Due: ${formatDate(task.dueDate)}`
+              :aria-label="`Task: ${task.title}, Priority: ${task.priority}, Due: ${formatDate(task.dueDate)}`"
             >
               <div class="task-header">
                 <div class="task-info">
