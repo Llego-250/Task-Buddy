@@ -533,13 +533,16 @@ export default {
   },
   computed: {
     activeTasks() {
-      return this.tasks.filter(task => !task.completed && new Date(task.dueDate) >= new Date().setHours(0,0,0,0))
+      const tasks = this.filteredTasks.length ? this.filteredTasks : this.tasks
+      return tasks.filter(task => !task.completed && new Date(task.dueDate) >= new Date().setHours(0,0,0,0))
     },
     completedTasks() {
-      return this.tasks.filter(task => task.completed)
+      const tasks = this.filteredTasks.length ? this.filteredTasks : this.tasks
+      return tasks.filter(task => task.completed)
     },
     overdueTasks() {
-      return this.tasks.filter(task => !task.completed && new Date(task.dueDate) < new Date().setHours(0,0,0,0))
+      const tasks = this.filteredTasks.length ? this.filteredTasks : this.tasks
+      return tasks.filter(task => !task.completed && new Date(task.dueDate) < new Date().setHours(0,0,0,0))
     },
     visibleActiveTasks() {
       return this.activeTasks.slice(0, this.visibleTasks.active)
