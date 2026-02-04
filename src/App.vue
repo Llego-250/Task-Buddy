@@ -329,13 +329,11 @@
   </div>
 </div>
 
-<!-- Notifications -->
-<div v-if="notifications.length" class="notifications">
-  <div v-for="notification in notifications" :key="notification.id" class="notification">
-    🔔 {{ notification.message }}
-    <button @click="dismissNotification(notification.id)">×</button>
-  </div>
-</div>
+<!-- Enhanced Notifications -->
+<EnhancedNotifications 
+  :tasks="tasks"
+  @settings-updated="handleNotificationSettings"
+/>
 
 <!-- UI/UX Enhancement Components -->
 <ThemeToggle />
@@ -378,6 +376,7 @@ import ProgressBar from './components/ProgressBar.vue'
 import TimeReports from './components/TimeReports.vue'
 import SearchFilter from './components/SearchFilter.vue'
 import AnalyticsDashboard from './components/AnalyticsDashboard.vue'
+import EnhancedNotifications from './components/EnhancedNotifications.vue'
 
 export default {
   components: {
@@ -392,7 +391,8 @@ export default {
     ProgressBar,
     TimeReports,
     SearchFilter,
-    AnalyticsDashboard
+    AnalyticsDashboard,
+    EnhancedNotifications
   },
   data() {
     return {
@@ -416,6 +416,12 @@ export default {
       calendarVisible: false,
       currentDate: new Date(),
       notifications: [],
+      notificationSettings: {
+        soundEnabled: true,
+        emailEnabled: false,
+        email: '',
+        defaultReminder: 30
+      },
       visibleTasks: { completed: 3, active: 3, overdue: 3 },
       tasks: [
         { 
@@ -848,6 +854,11 @@ export default {
     
     handleFilteredTasks(filtered) {
       this.filteredTasks = filtered
+    },
+    
+    handleNotificationSettings(settings) {
+      this.notificationSettings = settings
+      localStorage.setItem('notificationSettings', JSON.stringify(settings))
     }
   },
   mounted() {
