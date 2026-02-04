@@ -399,6 +399,7 @@ export default {
       showShortcutsHelp: false,
       showSearch: false,
       showTimeReports: false,
+      filteredTasks: [],
       calendarVisible: false,
       currentDate: new Date(),
       notifications: [],
