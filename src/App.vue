@@ -840,13 +840,51 @@ export default {
 body {
   font-family: Arial, sans-serif;
   margin: 0px;
-  background: linear-gradient(rgb(14, 10, 111), rgb(20, 209, 211));
+  background: var(--bg-primary);
   min-width: 320px;
   min-height: 100vh;
-  background: linear-gradient(135deg, rgb(30, 58, 138), rgb(6, 182, 212));
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
+  color: var(--text-primary);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  body {
+    padding: 0.5rem;
+  }
+  
+  .card-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .card {
+    min-width: unset;
+    width: 100%;
+  }
+  
+  .task-modal {
+    max-width: 95%;
+    padding: 1.5rem;
+  }
+  
+  .subtask-input {
+    grid-template-columns: 1fr 80px 30px;
+    gap: 8px;
+  }
+  
+  .bulk-actions {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  
+  .task-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
 }
 
 .main-container {
