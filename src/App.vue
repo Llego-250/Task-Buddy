@@ -296,6 +296,8 @@ export default {
           createdAt: new Date(2024, 11, 15), 
           completed: false,
           estimatedHours: 8,
+          recurring: { enabled: false, type: 'daily', interval: 1 },
+          dependencies: [],
           subtasks: [
             { id: 11, title: 'Setup Vue components', completed: false, hours: 2 },
             { id: 12, title: 'Implement task management', completed: false, hours: 4 },
