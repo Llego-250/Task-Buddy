@@ -312,13 +312,19 @@ import RecurringTasks from './components/RecurringTasks.vue'
 import TaskDependencies from './components/TaskDependencies.vue'
 import DragDropTasks from './components/DragDropTasks.vue'
 import BulkActions from './components/BulkActions.vue'
+import ThemeToggle from './components/ThemeToggle.vue'
+import KeyboardShortcuts from './components/KeyboardShortcuts.vue'
+import TaskSearch from './components/TaskSearch.vue'
 
 export default {
   components: {
     RecurringTasks,
     TaskDependencies,
     DragDropTasks,
-    BulkActions
+    BulkActions,
+    ThemeToggle,
+    KeyboardShortcuts,
+    TaskSearch
   },
   data() {
     return {
@@ -334,6 +340,8 @@ export default {
       newRecurring: { enabled: false, type: 'daily', interval: 1 },
       newDependencies: [],
       bulkMode: false,
+      showShortcutsHelp: false,
+      showSearch: false,
       calendarVisible: false,
       currentDate: new Date(),
       notifications: [],
