@@ -369,6 +369,7 @@ import TimeTracker from './components/TimeTracker.vue'
 import ProgressBar from './components/ProgressBar.vue'
 import TimeReports from './components/TimeReports.vue'
 import SearchFilter from './components/SearchFilter.vue'
+import AnalyticsDashboard from './components/AnalyticsDashboard.vue'
 
 export default {
   components: {
