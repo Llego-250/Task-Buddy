@@ -177,6 +177,9 @@ export default {
   border-radius: 12px;
   padding: 1rem;
   border: 1px solid var(--border-color);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .search-bar {
