@@ -17,6 +17,9 @@
       <button @click="showTimeReports = true" class="reports-btn" title="Time Reports">
         📊
       </button>
+      <button @click="showAnalytics = true" class="analytics-btn" title="Analytics Dashboard">
+        📈
+      </button>
     </div>
 
     <!-- Task Creation Modal -->
@@ -354,6 +357,11 @@
   :show-reports="showTimeReports"
   :tasks="filteredTasks.length ? filteredTasks : tasks"
   @hide-reports="showTimeReports = false"
+/>
+<AnalyticsDashboard 
+  :show-dashboard="showAnalytics"
+  :tasks="tasks"
+  @hide-dashboard="showAnalytics = false"
 />
 </template>
 
@@ -1712,6 +1720,24 @@ button:active {
 
 .reports-btn:hover {
   background: linear-gradient(135deg, #d97706, #b45309);
+  transform: scale(1.1);
+}
+
+.analytics-btn {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: all 0.3s ease;
+}
+
+.analytics-btn:hover {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
   transform: scale(1.1);
 }
 
