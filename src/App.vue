@@ -100,68 +100,113 @@
     </div>
 
     <div class="card">
-      <div class="card-title">Active Tasks</div>
+      <div class="card-title">
+        Active Tasks
+        <button @click="bulkMode = !bulkMode" class="bulk-toggle-btn">
+          {{ bulkMode ? 'Exit Bulk' : 'Bulk Actions' }}
+        </button>
+      </div>
       <div class="task">
-        <div v-for="(task, index) in visibleActiveTasks" :key="task.id" 
-             class="task-item" 
-             @click="toggleTask('active', index)" 
-             :class="{expanded: expandedTask.type === 'active' && expandedTask.index === index}">
-          <div class="task-header">
-            <div class="task-info">
-              <span class="task-title">{{ task.title }}</span>
-              <div class="task-meta">
-                <span class="priority-badge" :class="`priority-${task.priority || 'medium'}`">{{ (task.priority || 'medium').toUpperCase() }}</span>
-                <span class="category-badge" :class="`category-${task.category || 'work'}`">{{ task.category || 'work' }}</span>
-                <span class="task-date">Due: {{ formatDate(task.dueDate) }}</span>
-                <span class="task-hours">{{ task.estimatedHours }}h</span>
-              </div>
-            </div>
-            <div class="task-actions">
-              <button @click.stop="toggleEdit('active', index)" class="edit-btn" title="Edit Task">✏️</button>
-              <button @click.stop="deleteTask('active', index)" class="delete-btn" title="Delete Task">🗑️</button>
-            </div>
-          </div>
-          <div v-if="expandedTask.type === 'active' && expandedTask.index === index" class="task-description">
-            <div v-if="editingTask && editingTask.type === 'active' && editingTask.index === index" class="edit-form">
-              <input v-model="editForm.title" placeholder="Task title" class="edit-input" required>
-              <textarea v-model="editForm.description" placeholder="Task description" class="edit-textarea"></textarea>
-              <input v-model="editForm.dueDate" type="date" class="edit-input">
-              <select v-model="editForm.priority" class="edit-select">
-                <option value="low">Low Priority</option>
-                <option value="medium">Medium Priority</option>
-                <option value="high">High Priority</option>
-              </select>
-              <select v-model="editForm.category" class="edit-select">
-                <option value="work">Work</option>
-                <option value="personal">Personal</option>
-                <option value="project">Project</option>
-              </select>
-              <div class="subtasks-edit">
-                <h5>Subtasks</h5>
-                <div v-for="(subtask, subIndex) in editForm.subtasks" :key="subtask.id" class="subtask-edit-item">
-                  <input v-model="subtask.title" placeholder="Subtask name" class="subtask-edit-input">
-                  <input v-model.number="subtask.hours" type="number" placeholder="Hours" min="0" step="0.5" class="subtask-hours-input">
-                  <button @click.stop="removeEditSubtask(subIndex)" class="remove-subtask-btn">×</button>
+        <BulkActions 
+          v-if="bulkMode" 
+          :tasks="visibleActiveTasks"
+          @bulk-complete="handleBulkComplete"
+          @bulk-delete="handleBulkDelete"
+          @bulk-category-change="handleBulkCategoryChange"
+        >
+          <template #default="{ task, index, selected }">
+            <DragDropTasks 
+              :tasks="[task]" 
+              category="active"
+              @reorder="handleReorder"
+              @move-category="handleMoveCategory"
+            >
+              <template #default="{ task: dragTask }">
+                <div :class="['task-item', { selected }]" @click="toggleTask('active', index)">
+                  <div class="task-header">
+                    <div class="task-info">
+                      <span class="task-title">{{ dragTask.title }}</span>
+                      <div class="task-meta">
+                        <span class="priority-badge" :class="`priority-${dragTask.priority || 'medium'}`">{{ (dragTask.priority || 'medium').toUpperCase() }}</span>
+                        <span class="category-badge" :class="`category-${dragTask.category || 'work'}`">{{ dragTask.category || 'work' }}</span>
+                        <span class="task-date">Due: {{ formatDate(dragTask.dueDate) }}</span>
+                        <span class="task-hours">{{ dragTask.estimatedHours }}h</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <button @click.stop="addEditSubtask" class="add-edit-subtask-btn">+ Add Subtask</button>
-              </div>
-              <div class="edit-actions">
-                <button @click.stop="saveEdit" class="save-btn">Save Changes</button>
-                <button @click.stop="cancelEdit" class="cancel-btn">Cancel</button>
-              </div>
-            </div>
-            <div v-else>
-              <div class="subtasks">
-                <div v-for="subtask in task.subtasks" :key="subtask.id" class="subtask-item">
-                  <input type="checkbox" v-model="subtask.completed" @click.stop>
-                  <span :class="{ 'completed': subtask.completed }">{{ subtask.title }}</span>
-                  <span class="subtask-hours">{{ subtask.hours }}h</span>
+              </template>
+            </DragDropTasks>
+          </template>
+        </BulkActions>
+        
+        <DragDropTasks 
+          v-else
+          :tasks="visibleActiveTasks" 
+          category="active"
+          @reorder="handleReorder"
+          @move-category="handleMoveCategory"
+        >
+          <template #default="{ task, index }">
+            <div class="task-item" @click="toggleTask('active', index)" :class="{expanded: expandedTask.type === 'active' && expandedTask.index === index}">
+              <div class="task-header">
+                <div class="task-info">
+                  <span class="task-title">{{ task.title }}</span>
+                  <div class="task-meta">
+                    <span class="priority-badge" :class="`priority-${task.priority || 'medium'}`">{{ (task.priority || 'medium').toUpperCase() }}</span>
+                    <span class="category-badge" :class="`category-${task.category || 'work'}`">{{ task.category || 'work' }}</span>
+                    <span class="task-date">Due: {{ formatDate(task.dueDate) }}</span>
+                    <span class="task-hours">{{ task.estimatedHours }}h</span>
+                  </div>
+                </div>
+                <div class="task-actions">
+                  <button @click.stop="toggleEdit('active', index)" class="edit-btn" title="Edit Task">✏️</button>
+                  <button @click.stop="deleteTask('active', index)" class="delete-btn" title="Delete Task">🗑️</button>
                 </div>
               </div>
-              <button @click.stop="completeTask(task.id)" class="complete-btn">✓</button>
+              <div v-if="expandedTask.type === 'active' && expandedTask.index === index" class="task-description">
+                <div v-if="editingTask && editingTask.type === 'active' && editingTask.index === index" class="edit-form">
+                  <input v-model="editForm.title" placeholder="Task title" class="edit-input" required>
+                  <textarea v-model="editForm.description" placeholder="Task description" class="edit-textarea"></textarea>
+                  <input v-model="editForm.dueDate" type="date" class="edit-input">
+                  <select v-model="editForm.priority" class="edit-select">
+                    <option value="low">Low Priority</option>
+                    <option value="medium">Medium Priority</option>
+                    <option value="high">High Priority</option>
+                  </select>
+                  <select v-model="editForm.category" class="edit-select">
+                    <option value="work">Work</option>
+                    <option value="personal">Personal</option>
+                    <option value="project">Project</option>
+                  </select>
+                  <div class="subtasks-edit">
+                    <h5>Subtasks</h5>
+                    <div v-for="(subtask, subIndex) in editForm.subtasks" :key="subtask.id" class="subtask-edit-item">
+                      <input v-model="subtask.title" placeholder="Subtask name" class="subtask-edit-input">
+                      <input v-model.number="subtask.hours" type="number" placeholder="Hours" min="0" step="0.5" class="subtask-hours-input">
+                      <button @click.stop="removeEditSubtask(subIndex)" class="remove-subtask-btn">×</button>
+                    </div>
+                    <button @click.stop="addEditSubtask" class="add-edit-subtask-btn">+ Add Subtask</button>
+                  </div>
+                  <div class="edit-actions">
+                    <button @click.stop="saveEdit" class="save-btn">Save Changes</button>
+                    <button @click.stop="cancelEdit" class="cancel-btn">Cancel</button>
+                  </div>
+                </div>
+                <div v-else>
+                  <div class="subtasks">
+                    <div v-for="subtask in task.subtasks" :key="subtask.id" class="subtask-item">
+                      <input type="checkbox" v-model="subtask.completed" @click.stop>
+                      <span :class="{ 'completed': subtask.completed }">{{ subtask.title }}</span>
+                      <span class="subtask-hours">{{ subtask.hours }}h</span>
+                    </div>
+                  </div>
+                  <button @click.stop="completeTask(task.id)" class="complete-btn">✓</button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          </template>
+        </DragDropTasks>
         <button v-if="activeTasks.length > visibleTasks.active" 
                 @click="loadMoreTasks('active')" class="view-more-btn">
           View More ({{ activeTasks.length - visibleTasks.active }} remaining)
