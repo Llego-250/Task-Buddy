@@ -900,15 +900,26 @@ body {
   margin-bottom: 2rem;
 }
 .title {
-  color: white;
+  color: var(--text-primary);
   font-size: 2.25rem;
   font-weight: bold;
   margin-bottom: 1rem;
 }
 .subtitle {
-  color: white;
+  color: var(--text-primary);
   font-size: 1.25rem;
   margin: 0 2.5rem 2rem;
+}
+
+/* Mobile responsive title */
+@media (max-width: 768px) {
+  .title {
+    font-size: 1.8rem;
+  }
+  .subtitle {
+    font-size: 1rem;
+    margin: 0 1rem 1.5rem;
+  }
 }
 .input-section {
   margin-bottom: 2rem;
