@@ -1000,9 +1000,10 @@ body {
 .input-section {
   position: fixed;
   left: 0;
-  top: 0;
-  height: 100vh;
+  top: 150px;
+  height: 300px;
   width: 70px;
+  border-radius:50px;
   background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
   display: flex;
