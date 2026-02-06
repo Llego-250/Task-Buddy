@@ -20,9 +20,6 @@
       <button @click="showAnalytics = true" class="analytics-btn" title="Analytics Dashboard">
         📈
       </button>
-      <button @click="showNotificationsDemo = true" class="demo-btn" title="Notifications Demo">
-        🔔
-      </button>
     </div>
 
     <!-- Task Creation Modal -->
@@ -62,11 +59,6 @@
             v-model="newDependencies" 
             :available-tasks="activeTasks" 
             :current-task-id="null"
-          />
-          
-          <CustomReminders 
-            v-model="newCustomReminders"
-            :task-due-date="taskDate"
           />
           
           <div class="task-actions">
@@ -337,12 +329,6 @@
   </div>
 </div>
 
-<!-- Enhanced Notifications -->
-<EnhancedNotifications 
-  :tasks="tasks"
-  @settings-updated="handleNotificationSettings"
-/>
-
 <!-- UI/UX Enhancement Components -->
 <ThemeToggle />
 <KeyboardShortcuts 
@@ -369,12 +355,6 @@
   :tasks="tasks"
   @hide-dashboard="showAnalytics = false"
 />
-<NotificationsDemo 
-  v-if="showNotificationsDemo"
-  @demo-action="handleDemoAction"
-  @create-notification="handleDemoNotification"
-  @close="showNotificationsDemo = false"
-/>
 </template>
 
 <script>
@@ -390,9 +370,6 @@ import ProgressBar from './components/ProgressBar.vue'
 import TimeReports from './components/TimeReports.vue'
 import SearchFilter from './components/SearchFilter.vue'
 import AnalyticsDashboard from './components/AnalyticsDashboard.vue'
-import EnhancedNotifications from './components/EnhancedNotifications.vue'
-import CustomReminders from './components/CustomReminders.vue'
-import NotificationsDemo from './components/NotificationsDemo.vue'
 
 export default {
   components: {
@@ -407,10 +384,7 @@ export default {
     ProgressBar,
     TimeReports,
     SearchFilter,
-    AnalyticsDashboard,
-    EnhancedNotifications,
-    CustomReminders,
-    NotificationsDemo
+    AnalyticsDashboard
   },
   data() {
     return {
@@ -425,23 +399,15 @@ export default {
       newSubtasks: [],
       newRecurring: { enabled: false, type: 'daily', interval: 1 },
       newDependencies: [],
-      newCustomReminders: [],
       bulkMode: false,
       showShortcutsHelp: false,
       showSearch: false,
       showTimeReports: false,
       filteredTasks: [],
       showAnalytics: false,
-      showNotificationsDemo: false,
       calendarVisible: false,
       currentDate: new Date(),
       notifications: [],
-      notificationSettings: {
-        soundEnabled: true,
-        emailEnabled: false,
-        email: '',
-        defaultReminder: 30
-      },
       visibleTasks: { completed: 3, active: 3, overdue: 3 },
       tasks: [
         { 
@@ -713,7 +679,6 @@ export default {
           category: this.newTaskCategory,
           recurring: this.newRecurring,
           dependencies: this.newDependencies,
-          customReminders: this.newCustomReminders,
           subtasks: this.newSubtasks.map((subtask, index) => ({
             id: Date.now() + index,
             title: subtask.title,
@@ -734,7 +699,6 @@ export default {
         this.newSubtasks = []
         this.newRecurring = { enabled: false, type: 'daily', interval: 1 }
         this.newDependencies = []
-        this.newCustomReminders = []
         this.showingTaskForm = false
       }
     },
@@ -747,7 +711,6 @@ export default {
       this.newTask = ''
       this.taskDate = ''
       this.newSubtasks = []
-      this.newCustomReminders = []
     },
     addSubtask() {
       this.newSubtasks.push({ title: '', hours: 1 })
@@ -877,26 +840,6 @@ export default {
     
     handleFilteredTasks(filtered) {
       this.filteredTasks = filtered
-    },
-    
-    handleNotificationSettings(settings) {
-      this.notificationSettings = settings
-      localStorage.setItem('notificationSettings', JSON.stringify(settings))
-    },
-    
-    handleDemoAction(message) {
-      this.notifications.push({
-        id: Date.now(),
-        message: `Demo: ${message}`
-      })
-      setTimeout(() => {
-        this.notifications = this.notifications.filter(n => n.id !== Date.now())
-      }, 3000)
-    },
-    
-    handleDemoNotification(notification) {
-      // This would be handled by the EnhancedNotifications component
-      console.log('Demo notification created:', notification)
     }
   },
   mounted() {
@@ -958,10 +901,11 @@ body {
   background: var(--bg-primary);
   min-width: 320px;
   min-height: 100vh;
-  padding: 1.25rem;
+  padding: 0.5rem;
   display: flex;
   flex-direction: column;
   color: var(--text-primary);
+  overflow-x: hidden;
 }
 
 /* Mobile Responsive */
@@ -981,7 +925,7 @@ body {
   }
   
   .task-modal {
-    max-width: 95%;
+    max-width: 100%;
     padding: 1.5rem;
   }
   
@@ -1012,18 +956,18 @@ body {
 
 .header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 .title {
   color: var(--text-primary);
-  font-size: 2.25rem;
+  font-size: 1.8rem;
   font-weight: bold;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 .subtitle {
   color: var(--text-primary);
-  font-size: 1.25rem;
-  margin: 0 2.5rem 2rem;
+  font-size: 1rem;
+  margin: 0 1rem 1rem;
 }
 
 /* Mobile responsive title */
@@ -1037,27 +981,33 @@ body {
   }
 }
 .input-section {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 .card-container {
   flex: 1;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: flex-start;
-  gap: 2rem;
-  max-width: 1400px;
+  gap: 3.5rem;
+  max-width: 100%;
   margin: 0 auto;
+  padding: 0 0.5rem;
 }
 .card{
   flex: 1;
-  min-width: 300px;
+  min-width: 220px;
+  max-width: 320px;
   background: var(--bg-secondary);
-  border-radius: 20px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 2rem;
   color: var(--text-primary);
   backdrop-filter: blur(20px);
-  border: 2px solid var(--border-color);
+  border: 1px solid var(--border-color);
 }
 .card.completed {
   background: linear-gradient(rgb(34, 197, 94), rgba(82, 108, 96, 0.299), rgb(21, 128, 61));
@@ -1066,28 +1016,29 @@ body {
   background: linear-gradient(rgb(239, 68, 68), rgba(108, 82, 82, 0.299), rgb(185, 28, 28));
 }
 .card-title{
-  font-size: 2.1em;
+  font-size: 1.2em;
   font-weight: bold;
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
   text-align: center;
 }
 .task{
-  width: 90%;
+  width: 100%;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  padding: 0.8rem;
 }
 .task-item{
-  padding: 0.8rem;
-  margin: 0.5rem 0;
+  padding: 0.5rem;
+  margin: 0.4rem 0;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+  border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   cursor: pointer;
   transition: all 0.3s ease;
+  font-size: 0.9em;
 }
 .task-item:hover {
   background: rgba(255, 255, 255, 0.2);
@@ -1106,14 +1057,16 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 0.3rem;
+  margin-top: 0.2rem;
+  flex-wrap: wrap;
+  gap: 0.3rem;
 }
 
 .task-hours {
   background: rgba(255, 255, 255, 0.2);
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 0.7em;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 0.65em;
   font-weight: bold;
 }
 
@@ -1246,11 +1199,17 @@ button:active {
 }
 
 .calendar-btn {
-  font-size: 1.4em;
-  margin-left: 12px;
-  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2em;
+  margin: 0;
+  padding: 12px;
   background: linear-gradient(135deg, #f59e0b, #d97706);
   box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+  border-radius: 12px;
+  width: 48px;
+  height: 48px;
 }
 
 .calendar-btn:hover {
@@ -1645,14 +1604,14 @@ button:active {
 }
 
 .priority-badge {
-  padding: 3px 8px;
-  border-radius: 12px;
-  font-size: 0.7em;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 0.65em;
   font-weight: bold;
-  margin-right: 0.5rem;
+  margin-right: 0.3rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .priority-high { 
@@ -1677,13 +1636,13 @@ button:active {
 }
 
 .category-badge {
-  padding: 3px 8px;
-  border-radius: 12px;
-  font-size: 0.7em;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 0.65em;
   font-weight: bold;
-  margin-right: 0.5rem;
+  margin-right: 0.3rem;
   text-transform: capitalize;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .category-work { 
@@ -1736,16 +1695,19 @@ button:active {
 }
 
 .help-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: linear-gradient(135deg, #6366f1, #4f46e5);
   color: white;
   border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  border-radius: 12px;
+  width: 48px;
+  height: 48px;
   font-size: 18px;
   font-weight: bold;
   cursor: pointer;
-  margin-left: 8px;
+  margin: 0;
   transition: all 0.3s ease;
 }
 
@@ -1755,15 +1717,18 @@ button:active {
 }
 
 .reports-btn {
+  display:flex;
+  align-items: center;
+  justify-content: center;
   background: linear-gradient(135deg, #f59e0b, #d97706);
   color: white;
   border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  border-radius: 12px;
+  width: 48px;
+  height: 48px;
   font-size: 16px;
   cursor: pointer;
-  margin-left: 8px;
+  margin: 0;
   transition: all 0.3s ease;
 }
 
@@ -1773,38 +1738,23 @@ button:active {
 }
 
 .analytics-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: linear-gradient(135deg, #8b5cf6, #7c3aed);
   color: white;
   border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  border-radius: 12px;
+  width: 48px;
+  height: 48px;
   font-size: 16px;
   cursor: pointer;
-  margin-left: 8px;
+  margin: 0;
   transition: all 0.3s ease;
 }
 
 .analytics-btn:hover {
   background: linear-gradient(135deg, #7c3aed, #6d28d9);
-  transform: scale(1.1);
-}
-
-.demo-btn {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-size: 16px;
-  cursor: pointer;
-  margin-left: 8px;
-  transition: all 0.3s ease;
-}
-
-.demo-btn:hover {
-  background: linear-gradient(135deg, #d97706, #b45309);
   transform: scale(1.1);
 }
 
