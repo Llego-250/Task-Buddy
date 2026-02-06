@@ -432,11 +432,15 @@ export default {
         },
         { 
           id: 2, 
-          title: 'Study for exam', 
+          title: 'Study for exam',
+          description: '',
+          priority: 'high',
+          category: 'personal',
           dueDate: new Date(2024, 11, 30), 
           createdAt: new Date(2024, 11, 10), 
           completed: false,
           estimatedHours: 6,
+          actualSeconds: 0,
           recurring: { enabled: false, type: 'daily', interval: 1 },
           dependencies: [],
           subtasks: [
@@ -447,11 +451,17 @@ export default {
         },
         { 
           id: 3, 
-          title: 'Complete Vue.js tutorial', 
+          title: 'Complete Vue.js tutorial',
+          description: '',
+          priority: 'medium',
+          category: 'work',
           dueDate: new Date(2024, 11, 28), 
           createdAt: new Date(2024, 11, 12), 
           completed: false,
           estimatedHours: 4,
+          actualSeconds: 0,
+          recurring: { enabled: false, type: 'daily', interval: 1 },
+          dependencies: [],
           subtasks: [
             { id: 31, title: 'Watch tutorial videos', completed: false, hours: 2 },
             { id: 32, title: 'Build sample app', completed: false, hours: 2 }
@@ -459,11 +469,17 @@ export default {
         },
         { 
           id: 4, 
-          title: 'Setup project structure', 
+          title: 'Setup project structure',
+          description: '',
+          priority: 'medium',
+          category: 'project',
           dueDate: new Date(2024, 11, 5), 
           createdAt: new Date(2024, 11, 1), 
           completed: true,
           estimatedHours: 2,
+          actualSeconds: 0,
+          recurring: { enabled: false, type: 'daily', interval: 1 },
+          dependencies: [],
           subtasks: [
             { id: 41, title: 'Create folders', completed: true, hours: 0.5 },
             { id: 42, title: 'Initialize Git', completed: true, hours: 0.5 },
@@ -472,11 +488,17 @@ export default {
         },
         { 
           id: 5, 
-          title: 'Design UI mockups', 
+          title: 'Design UI mockups',
+          description: '',
+          priority: 'low',
+          category: 'project',
           dueDate: new Date(2024, 11, 8), 
           createdAt: new Date(2024, 11, 3), 
           completed: true,
           estimatedHours: 3,
+          actualSeconds: 0,
+          recurring: { enabled: false, type: 'daily', interval: 1 },
+          dependencies: [],
           subtasks: [
             { id: 51, title: 'Wireframes', completed: true, hours: 1 },
             { id: 52, title: 'High-fidelity designs', completed: true, hours: 2 }
@@ -484,11 +506,17 @@ export default {
         },
         { 
           id: 6, 
-          title: 'Install dependencies', 
+          title: 'Install dependencies',
+          description: '',
+          priority: 'medium',
+          category: 'work',
           dueDate: new Date(2024, 11, 10), 
           createdAt: new Date(2024, 11, 5), 
           completed: true,
           estimatedHours: 1,
+          actualSeconds: 0,
+          recurring: { enabled: false, type: 'daily', interval: 1 },
+          dependencies: [],
           subtasks: [
             { id: 61, title: 'Install Vue 3', completed: true, hours: 0.5 },
             { id: 62, title: 'Setup build tools', completed: true, hours: 0.5 }
@@ -496,11 +524,17 @@ export default {
         },
         { 
           id: 7, 
-          title: 'Update portfolio website', 
+          title: 'Update portfolio website',
+          description: '',
+          priority: 'low',
+          category: 'personal',
           dueDate: new Date(2024, 11, 20), 
           createdAt: new Date(2024, 11, 8), 
           completed: false,
           estimatedHours: 5,
+          actualSeconds: 0,
+          recurring: { enabled: false, type: 'daily', interval: 1 },
+          dependencies: [],
           subtasks: [
             { id: 71, title: 'Add new projects', completed: false, hours: 2 },
             { id: 72, title: 'Update resume section', completed: false, hours: 2 },
@@ -509,11 +543,17 @@ export default {
         },
         { 
           id: 8, 
-          title: 'Prepare presentation slides', 
+          title: 'Prepare presentation slides',
+          description: '',
+          priority: 'high',
+          category: 'work',
           dueDate: new Date(2024, 11, 22), 
           createdAt: new Date(2024, 11, 10), 
           completed: false,
           estimatedHours: 3,
+          actualSeconds: 0,
+          recurring: { enabled: false, type: 'daily', interval: 1 },
+          dependencies: [],
           subtasks: [
             { id: 81, title: 'Create outline', completed: false, hours: 1 },
             { id: 82, title: 'Design slides', completed: false, hours: 2 }
@@ -521,11 +561,17 @@ export default {
         },
         { 
           id: 9, 
-          title: 'Submit assignment report', 
+          title: 'Submit assignment report',
+          description: '',
+          priority: 'high',
+          category: 'work',
           dueDate: new Date(2024, 11, 18), 
           createdAt: new Date(2024, 11, 5), 
           completed: false,
           estimatedHours: 4,
+          actualSeconds: 0,
+          recurring: { enabled: false, type: 'daily', interval: 1 },
+          dependencies: [],
           subtasks: [
             { id: 91, title: 'Write introduction', completed: false, hours: 1 },
             { id: 92, title: 'Document methodology', completed: false, hours: 2 },
@@ -599,29 +645,43 @@ export default {
     },
     toggleEdit(type, index) {
       const task = this.getTaskByTypeAndIndex(type, index)
+      if (!task) return
       this.editingTask = { type, index }
       this.editForm = { 
         ...task, 
         dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
-        subtasks: [...task.subtasks]
+        subtasks: task.subtasks ? [...task.subtasks] : []
       }
     },
     saveEdit() {
-      if (!this.editForm.title.trim()) {
+      if (!this.editForm.title || !this.editForm.title.trim()) {
         alert('Task title is required!')
         return
       }
       const task = this.getTaskByTypeAndIndex(this.editingTask.type, this.editingTask.index)
-      const updatedTask = {
-        ...this.editForm,
-        dueDate: new Date(this.editForm.dueDate),
-        estimatedHours: this.editForm.subtasks.reduce((sum, subtask) => sum + (parseFloat(subtask.hours) || 0), 0)
+      if (!task) return
+      
+      const taskIndex = this.tasks.findIndex(t => t.id === task.id)
+      if (taskIndex !== -1) {
+        const validSubtasks = (this.editForm.subtasks || []).filter(s => s.title && s.title.trim())
+        this.tasks.splice(taskIndex, 1, {
+          ...this.tasks[taskIndex],
+          title: this.editForm.title,
+          description: this.editForm.description || '',
+          dueDate: new Date(this.editForm.dueDate),
+          priority: this.editForm.priority,
+          category: this.editForm.category,
+          subtasks: validSubtasks,
+          estimatedHours: validSubtasks.reduce((sum, subtask) => sum + (parseFloat(subtask.hours) || 0), 0)
+        })
       }
-      Object.assign(task, updatedTask)
       this.editingTask = null
       this.editForm = {}
     },
     addEditSubtask() {
+      if (!this.editForm.subtasks) {
+        this.editForm.subtasks = []
+      }
       this.editForm.subtasks.push({
         id: Date.now() + Math.random(),
         title: '',
@@ -630,7 +690,9 @@ export default {
       })
     },
     removeEditSubtask(index) {
-      this.editForm.subtasks.splice(index, 1)
+      if (this.editForm.subtasks) {
+        this.editForm.subtasks.splice(index, 1)
+      }
     },
     cancelEdit() {
       this.editingTask = null
@@ -643,75 +705,82 @@ export default {
     },
     deleteTask(type, index) {
       const task = this.getTaskByTypeAndIndex(type, index)
+      if (!task) return
+      
       const taskTitle = task.title
       
-      if (confirm(`Are you sure you want to permanently delete "${taskTitle}"?\n\nThis action cannot be undone.`)) {
-        this.tasks = this.tasks.filter(t => t.id !== task.id)
+      if (confirm(`Are you sure you want to permanently delete "${taskTitle}"?`)) {
+        const taskIndex = this.tasks.findIndex(t => t.id === task.id)
+        if (taskIndex !== -1) {
+          this.tasks.splice(taskIndex, 1)
+        }
         this.expandedTask = { type: null, index: null }
         this.editingTask = null
-        
-        // Show success notification
-        this.notifications.push({
-          id: Date.now(),
-          message: `Task "${taskTitle}" has been deleted successfully`
-        })
-        
-        // Auto-dismiss notification after 3 seconds
-        setTimeout(() => {
-          this.notifications = this.notifications.filter(n => n.id !== Date.now())
-        }, 3000)
       }
     },
     loadMoreTasks(type) {
       this.visibleTasks[type] += 3
     },
     addTask() {
-      if (this.newTask.trim() && this.taskDate) {
-        const totalHours = this.newSubtasks.reduce((sum, subtask) => sum + (parseFloat(subtask.hours) || 0), 0)
-        const newTask = {
-          id: Date.now(),
-          title: this.newTask,
-          dueDate: new Date(this.taskDate),
-          createdAt: new Date(),
-          completed: false,
-          estimatedHours: totalHours,
-          description: 'Task description',
-          priority: this.newTaskPriority,
-          category: this.newTaskCategory,
-          recurring: this.newRecurring,
-          dependencies: this.newDependencies,
-          subtasks: this.newSubtasks.map((subtask, index) => ({
-            id: Date.now() + index,
-            title: subtask.title,
-            completed: false,
-            hours: parseFloat(subtask.hours) || 0
-          }))
-        }
-        
-        this.tasks.push(newTask)
-        
-        // Handle recurring task creation
-        if (this.newRecurring.enabled) {
-          this.createRecurringTasks(newTask)
-        }
-        
-        this.newTask = ''
-        this.taskDate = ''
-        this.newSubtasks = []
-        this.newRecurring = { enabled: false, type: 'daily', interval: 1 }
-        this.newDependencies = []
-        this.showingTaskForm = false
+      if (!this.newTask.trim()) {
+        alert('Task name is required!')
+        return
       }
+      if (!this.taskDate) {
+        alert('Due date is required!')
+        return
+      }
+      
+      const validSubtasks = this.newSubtasks.filter(s => s.title && s.title.trim())
+      const totalHours = validSubtasks.reduce((sum, subtask) => sum + (parseFloat(subtask.hours) || 0), 0)
+      
+      const newTask = {
+        id: Date.now(),
+        title: this.newTask,
+        dueDate: new Date(this.taskDate),
+        createdAt: new Date(),
+        completed: false,
+        estimatedHours: totalHours || 0,
+        actualSeconds: 0,
+        description: '',
+        priority: this.newTaskPriority,
+        category: this.newTaskCategory,
+        recurring: { ...this.newRecurring },
+        dependencies: [...this.newDependencies],
+        subtasks: validSubtasks.map((subtask, index) => ({
+          id: Date.now() + index + 1,
+          title: subtask.title,
+          completed: false,
+          hours: parseFloat(subtask.hours) || 0
+        }))
+      }
+      
+      this.tasks.push(newTask)
+      
+      if (this.newRecurring.enabled) {
+        this.createRecurringTasks(newTask)
+      }
+      
+      this.newTask = ''
+      this.taskDate = ''
+      this.newSubtasks = []
+      this.newRecurring = { enabled: false, type: 'daily', interval: 1 }
+      this.newDependencies = []
+      this.showingTaskForm = false
     },
     showTaskForm() {
       this.showingTaskForm = true
-      this.addSubtask()
+      this.newSubtasks = []
     },
     hideTaskForm() {
       this.showingTaskForm = false
       this.newTask = ''
       this.taskDate = ''
       this.newSubtasks = []
+      this.newTaskPriority = 'medium'
+      this.newTaskCategory = 'work'
+      this.newRecurring = { enabled: false, type: 'daily', interval: 1 }
+      this.newDependencies = []
     },
     addSubtask() {
       this.newSubtasks.push({ title: '', hours: 1 })
@@ -807,7 +876,12 @@ export default {
     },
     
     handleBulkDelete(taskIds) {
-      this.tasks = this.tasks.filter(task => !taskIds.includes(task.id))
+      taskIds.forEach(id => {
+        const taskIndex = this.tasks.findIndex(t => t.id === id)
+        if (taskIndex !== -1) {
+          this.tasks.splice(taskIndex, 1)
+        }
+      })
     },
     
     handleBulkCategoryChange({ taskIds, category }) {
