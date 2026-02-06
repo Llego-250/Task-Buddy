@@ -5,7 +5,7 @@
     <h2 class="subtitle">Hello Beautiful User❤️, this is the personal task manager</h2>
     
     <div class="input-section">
-      <button @click="showTaskForm" class="create-task-btn">+ Create New Task</button>
+      <button @click="showTaskForm" class="create-task-btn">+</button>
       <button @click="showCalendar" class="calendar-btn">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
           <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
@@ -901,15 +901,30 @@ body {
   background: var(--bg-primary);
   min-width: 320px;
   min-height: 100vh;
-  padding: 0.5rem;
+  padding: 0;
   display: flex;
-  flex-direction: column;
   color: var(--text-primary);
   overflow-x: hidden;
 }
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+  .input-section {
+    width: 100%;
+    height: 60px;
+    flex-direction: row;
+    padding: 0 10px;
+    top: auto;
+    bottom: 0;
+    border-right: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .main-container {
+    margin-left: 0;
+    margin-bottom: 60px;
+  }
+  
   body {
     padding: 0.5rem;
   }
@@ -948,6 +963,8 @@ body {
 
 .main-container {
   transition: filter 0.3s ease;
+  flex: 1;
+  margin-left: 70px;
 }
 
 .main-container.blurred {
@@ -981,11 +998,20 @@ body {
   }
 }
 .input-section {
-  margin-bottom: 1rem;
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 70px;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
+  padding: 20px 0;
+  gap: 15px;
+  z-index: 100;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 .card-container {
   flex: 1;
@@ -1204,7 +1230,7 @@ button:active {
   justify-content: center;
   font-size: 1.2em;
   margin: 0;
-  padding: 12px;
+  padding: 0;
   background: linear-gradient(135deg, #f59e0b, #d97706);
   box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
   border-radius: 12px;
@@ -1347,8 +1373,14 @@ button:active {
 .create-task-btn {
   background: linear-gradient(135deg, #10b981, #059669);
   box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-  font-size: 18px;
-  padding: 14px 24px;
+  font-size: 20px;
+  padding: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
 }
 
 .create-task-btn:hover {
