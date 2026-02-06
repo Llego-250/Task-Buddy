@@ -584,7 +584,14 @@ export default {
   computed: {
     activeTasks() {
       const tasks = this.filteredTasks.length ? this.filteredTasks : this.tasks
-      return tasks.filter(task => !task.completed && new Date(task.dueDate) >= new Date().setHours(0,0,0,0))
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      return tasks.filter(task => {
+        if (task.completed) return false
+        const taskDate = new Date(task.dueDate)
+        taskDate.setHours(0, 0, 0, 0)
+        return taskDate >= today
+      })
     },
     completedTasks() {
       const tasks = this.filteredTasks.length ? this.filteredTasks : this.tasks
@@ -592,7 +599,14 @@ export default {
     },
     overdueTasks() {
       const tasks = this.filteredTasks.length ? this.filteredTasks : this.tasks
-      return tasks.filter(task => !task.completed && new Date(task.dueDate) < new Date().setHours(0,0,0,0))
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      return tasks.filter(task => {
+        if (task.completed) return false
+        const taskDate = new Date(task.dueDate)
+        taskDate.setHours(0, 0, 0, 0)
+        return taskDate < today
+      })
     },
     visibleActiveTasks() {
       return this.activeTasks.slice(0, this.visibleTasks.active)
