@@ -5,8 +5,8 @@
     :aria-label="isDark ? 'Switch to light theme' : 'Switch to dark theme'"
     :title="isDark ? 'Switch to light theme' : 'Switch to dark theme'"
   >
-    <span v-if="isDark">☀️</span>
-    <span v-else>🌙</span>
+    <span v-if="isDark">🌙</span>
+    <span v-else>☀️</span>
   </button>
 </template>
 
@@ -48,6 +48,9 @@ export default {
   cursor: pointer;
   transition: all 0.3s ease;
   z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .theme-toggle:hover {
   background: rgba(255, 255, 255, 0.3);
