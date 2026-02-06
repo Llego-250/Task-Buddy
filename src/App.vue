@@ -215,16 +215,6 @@
                   </div>
                 </div>
                 <div v-else>
-                  <ProgressBar 
-                    :subtasks="task.subtasks" 
-                    :estimated-hours="task.estimatedHours"
-                    :actual-seconds="task.actualSeconds || 0"
-                  />
-                  <TimeTracker 
-                    :task-id="task.id"
-                    :initial-time="task.actualSeconds || 0"
-                    @time-update="updateTaskTime"
-                  />
                   <div class="subtasks">
                     <div v-for="subtask in task.subtasks" :key="subtask.id" class="subtask-item">
                       <input type="checkbox" v-model="subtask.completed" @click.stop>
@@ -583,30 +573,33 @@ export default {
   },
   computed: {
     activeTasks() {
-      const tasks = this.filteredTasks.length ? this.filteredTasks : this.tasks
+      const allTasks = this.tasks
       const today = new Date()
       today.setHours(0, 0, 0, 0)
-      return tasks.filter(task => {
+      const active = allTasks.filter(task => {
         if (task.completed) return false
         const taskDate = new Date(task.dueDate)
         taskDate.setHours(0, 0, 0, 0)
         return taskDate >= today
       })
+      return this.filteredTasks.length ? active.filter(t => this.filteredTasks.some(ft => ft.id === t.id)) : active
     },
     completedTasks() {
-      const tasks = this.filteredTasks.length ? this.filteredTasks : this.tasks
-      return tasks.filter(task => task.completed)
+      const allTasks = this.tasks
+      const completed = allTasks.filter(task => task.completed)
+      return this.filteredTasks.length ? completed.filter(t => this.filteredTasks.some(ft => ft.id === t.id)) : completed
     },
     overdueTasks() {
-      const tasks = this.filteredTasks.length ? this.filteredTasks : this.tasks
+      const allTasks = this.tasks
       const today = new Date()
       today.setHours(0, 0, 0, 0)
-      return tasks.filter(task => {
+      const overdue = allTasks.filter(task => {
         if (task.completed) return false
         const taskDate = new Date(task.dueDate)
         taskDate.setHours(0, 0, 0, 0)
         return taskDate < today
       })
+      return this.filteredTasks.length ? overdue.filter(t => this.filteredTasks.some(ft => ft.id === t.id)) : overdue
     },
     visibleActiveTasks() {
       return this.activeTasks.slice(0, this.visibleTasks.active)
@@ -748,9 +741,7 @@ export default {
       const validSubtasks = this.newSubtasks.filter(s => s.title && s.title.trim())
       const totalHours = validSubtasks.reduce((sum, subtask) => sum + (parseFloat(subtask.hours) || 0), 0)
       
-      // Parse the date correctly
-      const [year, month, day] = this.taskDate.split('-').map(Number)
-      const dueDate = new Date(year, month - 1, day)
+      const dueDate = new Date(this.taskDate + 'T12:00:00')
       
       const newTask = {
         id: Date.now(),
