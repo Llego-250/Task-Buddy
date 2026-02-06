@@ -748,10 +748,14 @@ export default {
       const validSubtasks = this.newSubtasks.filter(s => s.title && s.title.trim())
       const totalHours = validSubtasks.reduce((sum, subtask) => sum + (parseFloat(subtask.hours) || 0), 0)
       
+      // Parse the date correctly
+      const [year, month, day] = this.taskDate.split('-').map(Number)
+      const dueDate = new Date(year, month - 1, day)
+      
       const newTask = {
         id: Date.now(),
         title: this.newTask,
-        dueDate: new Date(this.taskDate),
+        dueDate: dueDate,
         createdAt: new Date(),
         completed: false,
         estimatedHours: totalHours || 0,
