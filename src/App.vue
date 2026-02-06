@@ -386,6 +386,7 @@ export default {
     SearchFilter,
     AnalyticsDashboard
   },
+  // I used mockup (Nakoresheje sample task as Fallback)
   data() {
     return {
       expandedTask: { type: null, index: null },
