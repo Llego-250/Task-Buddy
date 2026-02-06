@@ -172,12 +172,11 @@ export default {
 
 <style scoped>
 .search-filter-container {
-  margin-bottom: 1rem;
+  margin-bottom: 1.3rem;
   background: var(--bg-secondary);
-  border-radius: 12px;
-  padding: 1rem;
+  border-radius: 40px;
   border: 1px solid var(--border-color);
-  max-width: 600px;
+  max-width: 455px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -186,6 +185,7 @@ export default {
   display: flex;
   gap: 8px;
   align-items: center;
+  border-radius: 30px;
 }
 
 .search-input {
@@ -193,7 +193,7 @@ export default {
   width: 300px;
   padding: 8px 12px;
   border: 1px solid var(--border-color);
-  border-radius: 6px;
+  border-radius: 30px;
   background: var(--bg-primary);
   color: var(--text-primary);
   font-size: 14px;
@@ -204,7 +204,7 @@ export default {
   background: var(--accent-color);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 30px;
   cursor: pointer;
   font-size: 12px;
   white-space: nowrap;
