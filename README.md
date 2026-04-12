@@ -77,3 +77,5 @@ Email Notifications: Send reminders via email
 Sound Alerts: Audio notifications for deadlines
 
 Snooze Options: Postpone reminders
+---
+Author AZE Solide
