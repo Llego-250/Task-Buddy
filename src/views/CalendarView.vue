@@ -21,10 +21,11 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useTaskStore } from '../stores/taskStore'
 
 const store = useTaskStore()
+onMounted(() => { if (!store.tasks.length) store.fetchTasks() })
 const currentDate = ref(new Date())
 
 const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']

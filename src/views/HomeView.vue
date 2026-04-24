@@ -1,5 +1,6 @@
 <template>
   <div class="home-container">
+    <div v-if="store.loading" class="loading-overlay">Loading tasks...</div>
     <div class="input-section">
       <button @click="showTaskForm" class="create-task-btn">+</button>
       <button @click="showShortcutsHelp = true" class="help-btn" title="Keyboard Shortcuts (?)">
@@ -48,7 +49,7 @@
           
           <div class="task-actions">
             <button @click="hideTaskForm" class="cancel-btn">Cancel</button>
-            <button @click="addTask" class="save-btn">Create Task</button>
+            <button @click="addTask" class="save-btn" :disabled="saving">{{ saving ? 'Saving...' : 'Create Task' }}</button>
           </div>
         </div>
       </div>
@@ -194,7 +195,7 @@
                       <button @click.stop="addEditSubtask" class="add-edit-subtask-btn">+ Add Subtask</button>
                     </div>
                     <div class="edit-actions">
-                      <button @click.stop="saveEdit" class="save-btn">Save Changes</button>
+                      <button @click.stop="saveEdit" class="save-btn" :disabled="saving">{{ saving ? 'Saving...' : 'Save Changes' }}</button>
                       <button @click.stop="cancelEdit" class="cancel-btn">Cancel</button>
                     </div>
                   </div>
@@ -257,7 +258,7 @@
                   <option value="project">Project</option>
                 </select>
                 <div class="edit-actions">
-                  <button @click.stop="saveEdit" class="save-btn">Save Changes</button>
+                  <button @click.stop="saveEdit" class="save-btn" :disabled="saving">{{ saving ? 'Saving...' : 'Save Changes' }}</button>
                   <button @click.stop="cancelEdit" class="cancel-btn">Cancel</button>
                 </div>
               </div>
@@ -311,6 +312,7 @@ import TaskSearch from '../components/TaskSearch.vue'
 
 const store = useTaskStore()
 const emit = defineEmits(['toggle-theme'])
+const saving = ref(false)
 
 // UI State
 const expandedTask = ref({ type: null, index: null })
@@ -368,23 +370,25 @@ const toggleEdit = (type, index) => {
   }
 }
 
-const saveEdit = () => {
-  if (!editForm.value.title || !editForm.value.title.trim()) {
-    alert('Task title is required!')
-    return
+const saveEdit = async () => {
+  if (!editForm.value.title?.trim()) { alert('Task title is required!'); return }
+
+  saving.value = true
+  const validSubtasks = (editForm.value.subtasks || []).filter(s => s.title?.trim())
+  try {
+    await store.updateTask({
+      ...editForm.value,
+      dueDate: new Date(editForm.value.dueDate),
+      subtasks: validSubtasks,
+      estimatedHours: validSubtasks.reduce((sum, s) => sum + (parseFloat(s.hours) || 0), 0)
+    })
+    editingTask.value = null
+    editForm.value = {}
+  } catch (e) {
+    alert('Failed to save: ' + e.message)
+  } finally {
+    saving.value = false
   }
-  
-  const validSubtasks = (editForm.value.subtasks || []).filter(s => s.title && s.title.trim())
-  const updatedTask = {
-    ...editForm.value,
-    dueDate: new Date(editForm.value.dueDate),
-    subtasks: validSubtasks,
-    estimatedHours: validSubtasks.reduce((sum, subtask) => sum + (parseFloat(subtask.hours) || 0), 0)
-  }
-  
-  store.updateTask(updatedTask)
-  editingTask.value = null
-  editForm.value = {}
 }
 
 const cancelEdit = () => {
@@ -401,15 +405,19 @@ const removeEditSubtask = (index) => {
   editForm.value.subtasks.splice(index, 1)
 }
 
-const completeTask = (id) => store.completeTask(id)
+const completeTask = (id) => store.completeTask(id).catch(e => alert('Error: ' + e.message))
 
-const deleteTask = (type, index) => {
+const deleteTask = async (type, index) => {
   const task = getTaskByTypeAndIndex(type, index)
   if (!task) return
   if (confirm(`Are you sure you want to permanently delete "${task.title}"?`)) {
-    store.deleteTask(task.id)
-    expandedTask.value = { type: null, index: null }
-    editingTask.value = null
+    try {
+      await store.deleteTask(task.id)
+      expandedTask.value = { type: null, index: null }
+      editingTask.value = null
+    } catch (e) {
+      alert('Failed to delete: ' + e.message)
+    }
   }
 }
 
@@ -441,43 +449,33 @@ const removeSubtask = (index) => {
   newSubtasks.value.splice(index, 1)
 }
 
-const addTask = () => {
-  if (!newTask.value.trim()) {
-    alert('Task name is required!')
-    return
-  }
-  if (!taskDate.value) {
-    alert('Due date is required!')
-    return
-  }
-  
+const addTask = async () => {
+  if (!newTask.value.trim()) { alert('Task name is required!'); return }
+  if (!taskDate.value) { alert('Due date is required!'); return }
+
+  saving.value = true
   const validSubtasks = newSubtasks.value.filter(s => s.title && s.title.trim())
-  const totalHours = validSubtasks.reduce((sum, subtask) => sum + (parseFloat(subtask.hours) || 0), 0)
-  const dueDate = new Date(taskDate.value + 'T12:00:00')
-  
-  const task = {
-    id: Date.now(),
-    title: newTask.value,
-    dueDate: dueDate,
-    createdAt: new Date(),
-    completed: false,
-    estimatedHours: totalHours || 0,
-    actualSeconds: 0,
-    description: '',
-    priority: newTaskPriority.value,
-    category: newTaskCategory.value,
-    recurring: { ...newRecurring.value },
-    dependencies: [...newDependencies.value],
-    subtasks: validSubtasks.map((subtask, index) => ({
-      id: Date.now() + index + 1,
-      title: subtask.title,
-      completed: false,
-      hours: parseFloat(subtask.hours) || 0
-    }))
+  const totalHours = validSubtasks.reduce((sum, s) => sum + (parseFloat(s.hours) || 0), 0)
+
+  try {
+    await store.addTask({
+      title: newTask.value,
+      dueDate: new Date(taskDate.value + 'T12:00:00'),
+      description: '',
+      priority: newTaskPriority.value,
+      category: newTaskCategory.value,
+      estimatedHours: totalHours || 0,
+      actualSeconds: 0,
+      recurring: { ...newRecurring.value },
+      dependencies: [...newDependencies.value],
+      subtasks: validSubtasks.map(s => ({ title: s.title, completed: false, hours: parseFloat(s.hours) || 0 }))
+    })
+    hideTaskForm()
+  } catch (e) {
+    alert('Failed to create task: ' + e.message)
+  } finally {
+    saving.value = false
   }
-  
-  store.addTask(task)
-  hideTaskForm()
 }
 
 const handleFilteredTasks = (filtered) => {
@@ -522,12 +520,23 @@ const focusSearch = () => {
   showSearch.value = true
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await store.fetchTasks()
   store.checkUpcomingDeadlines()
 })
 </script>
 
 <style scoped>
+.loading-overlay {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.1rem;
+  opacity: 0.7;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 /* Copy relevant styles from App.vue */
 .home-container {
   max-width: 100%;

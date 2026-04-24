@@ -12,10 +12,12 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue'
 import { useTaskStore } from '../stores/taskStore'
 import TimeReports from '../components/TimeReports.vue'
 
 const store = useTaskStore()
+onMounted(() => { if (!store.tasks.length) store.fetchTasks() })
 </script>
 
 <style scoped>

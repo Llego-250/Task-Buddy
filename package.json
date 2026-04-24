@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
+    "axios": "^1.15.2",
     "pinia": "^3.0.4",
     "sortablejs": "^1.15.6",
     "tailwindcss": "^4.1.18",
