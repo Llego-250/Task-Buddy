@@ -1,5 +1,8 @@
 <template>
-  <div class="flex h-screen overflow-hidden font-sans" :class="store.darkMode ? 'dark bg-gray-900' : 'bg-gray-50'">
+  <div v-if="isAuthRoute" class="h-screen overflow-hidden font-sans bg-[#f5f7fb]">
+    <router-view />
+  </div>
+  <div v-else class="flex h-screen overflow-hidden font-sans" :class="store.darkMode ? 'dark bg-gray-900' : 'bg-gray-50'">
     <AppSidebar />
     <div class="flex flex-col flex-1 overflow-hidden">
       <AppHeader :title="routeTitle" />
@@ -19,6 +22,7 @@ import AppHeader from './components/AppHeader.vue'
 
 const store = useTaskStore()
 const route = useRoute()
+const isAuthRoute = computed(() => route.path === '/login' || route.path === '/register')
 
 const routeTitle = computed(() => {
   const map = { '/tasks': 'Tasks', '/dashboard': 'Dashboard', '/settings': 'Settings' }

@@ -1,152 +1,153 @@
 <template>
-  <div class="flex flex-col gap-6 p-6 flex-1 overflow-y-auto" :class="store.darkMode ? 'bg-gray-900' : 'bg-gray-50'">
-
-    <!-- Stats row -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div v-for="stat in stats" :key="stat.label"
-        class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col gap-2">
-        <div class="flex items-center justify-between">
-          <p class="text-xs text-gray-400 font-medium">{{ stat.label }}</p>
-          <span class="text-lg">{{ stat.icon }}</span>
+  <div class="dashboard-page p-4 md:p-5">
+    <div class="dashboard-topbar">
+      <div>
+        <h2 class="dashboard-welcome">Welcome back, {{ userName }}! 👋</h2>
+        <p class="dashboard-subtitle">Here's what's happening with your today</p>
+      </div>
+      <div class="dashboard-toolbar">
+        <div class="dashboard-search">
+          <input v-model="search" placeholder="Search here..." />
         </div>
-        <p class="text-2xl font-bold text-gray-800">{{ stat.value }}</p>
-        <div class="w-full bg-gray-100 rounded-full h-1.5">
-          <div class="h-1.5 rounded-full transition-all" :class="stat.barColor" :style="{ width: stat.pct + '%' }"></div>
-        </div>
-        <p class="text-xs" :class="stat.textColor">{{ stat.sub }}</p>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <!-- Priority Breakdown -->
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-        <h2 class="font-semibold text-gray-700 mb-4 text-sm">Priority Breakdown</h2>
-        <div class="flex flex-col gap-3">
-          <div v-for="p in priorityBreakdown" :key="p.label" class="flex items-center gap-3">
-            <span class="text-xs font-semibold w-14" :class="p.color">{{ p.label }}</span>
-            <div class="flex-1 bg-gray-100 rounded-full h-2">
-              <div class="h-2 rounded-full" :class="p.bar" :style="{ width: p.pct + '%' }"></div>
-            </div>
-            <span class="text-xs text-gray-500 w-4 text-right">{{ p.count }}</span>
+    <div class="dashboard-grid">
+      <section class="dashboard-card">
+        <div class="dashboard-metrics">
+          <div class="metric-card" v-for="metric in metrics" :key="metric.label" :class="metric.tone">
+            <p class="metric-value">{{ metric.value }}</p>
+            <p class="metric-label">{{ metric.label }}</p>
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- Category Breakdown -->
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-        <h2 class="font-semibold text-gray-700 mb-4 text-sm">By Category</h2>
-        <div class="flex flex-col gap-2">
-          <div v-for="c in categoryBreakdown" :key="c.label" class="flex items-center justify-between">
-            <span class="text-xs text-gray-600">{{ c.label }}</span>
-            <div class="flex items-center gap-2">
-              <div class="w-20 bg-gray-100 rounded-full h-1.5">
-                <div class="h-1.5 rounded-full bg-blue-400" :style="{ width: c.pct + '%' }"></div>
-              </div>
-              <span class="text-xs text-gray-400 w-4 text-right">{{ c.count }}</span>
-            </div>
+      <section class="dashboard-card">
+        <div class="dashboard-card-head">
+          <div>
+            <h3>Task Priority</h3>
+            <p>Distribution by priority level</p>
+          </div>
+          <button class="dot-btn">...</button>
+        </div>
+        <div class="priority-visual">
+          <div class="donut-chart"></div>
+          <div class="priority-legend">
+            <span><i class="dot high"></i>High Priority: {{ counts.high }}</span>
+            <span><i class="dot medium"></i>Medium Priority: {{ counts.medium }}</span>
+            <span><i class="dot low"></i>Low Priority: {{ counts.low }}</span>
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- Completion Rate -->
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-3">
-        <h2 class="font-semibold text-gray-700 text-sm self-start">Completion Rate</h2>
-        <div class="relative w-28 h-28">
-          <svg class="w-28 h-28 -rotate-90" viewBox="0 0 36 36">
-            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f1f5f9" stroke-width="3"/>
-            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#3b82f6" stroke-width="3"
-              stroke-dasharray="100" :stroke-dashoffset="100 - completionRate"
-              stroke-linecap="round" style="transition: stroke-dashoffset 0.6s ease"/>
-          </svg>
-          <div class="absolute inset-0 flex flex-col items-center justify-center">
-            <span class="text-2xl font-bold text-gray-800">{{ completionRate }}%</span>
-            <span class="text-xs text-gray-400">Done</span>
+      <section class="dashboard-card">
+        <div class="dashboard-card-head">
+          <div>
+            <h3>Task Status Distribution</h3>
+          </div>
+          <button class="dot-btn">...</button>
+        </div>
+        <div class="status-distribution">
+          <div class="status-item">
+            <p>In Progress</p>
+            <strong>{{ statusRates.inProgress }}%</strong>
+          </div>
+          <div class="status-item">
+            <p>Completed</p>
+            <strong>{{ statusRates.completed }}%</strong>
+          </div>
+          <div class="status-item">
+            <p>Overdue</p>
+            <strong>{{ statusRates.overdue }}%</strong>
           </div>
         </div>
-        <p class="text-xs text-gray-400">{{ store.tasksByColumn['done']?.length || 0 }} of {{ store.tasks.length }} tasks</p>
-      </div>
-    </div>
+      </section>
 
-    <!-- Recent Tasks -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-      <div class="px-5 py-4 border-b border-gray-100">
-        <h2 class="font-semibold text-gray-700 text-sm">Recent Tasks</h2>
-      </div>
-      <table class="w-full text-sm">
-        <thead>
-          <tr class="border-b border-gray-50 text-left">
-            <th class="px-5 py-2.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Task</th>
-            <th class="px-5 py-2.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Status</th>
-            <th class="px-5 py-2.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Priority</th>
-            <th class="px-5 py-2.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Category</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="task in recentTasks" :key="task.id" class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-            <td class="px-5 py-3">
-              <div class="flex items-center gap-2">
-                <img v-if="task.assignee" :src="task.assignee.avatar" class="w-6 h-6 rounded-full object-cover" />
-                <span class="font-medium text-gray-700">{{ task.title || task.assignee?.name || 'Untitled' }}</span>
-              </div>
-            </td>
-            <td class="px-5 py-3">
-              <span class="text-xs px-2 py-0.5 rounded-full font-medium" :class="colClass(task.columnId)">{{ colLabel(task.columnId) }}</span>
-            </td>
-            <td class="px-5 py-3">
-              <span class="text-xs px-2 py-0.5 rounded-full font-semibold" :class="priorityClass(task.priority)">{{ task.priority }}</span>
-            </td>
-            <td class="px-5 py-3 text-xs text-gray-400">{{ task.category || '—' }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <section class="dashboard-card">
+        <div class="dashboard-card-head">
+          <div>
+            <h3>Activity</h3>
+            <p>Understand your productive and workload.</p>
+          </div>
+          <button class="dot-btn">...</button>
+        </div>
+        <div class="activity-rate">{{ completionRate }}%</div>
+        <div class="activity-grid">
+          <div
+            v-for="(cell, idx) in activityHeatmap"
+            :key="idx"
+            class="activity-cell"
+            :style="{ opacity: cell }"
+          ></div>
+        </div>
+      </section>
+
+      <section class="dashboard-card">
+        <div class="dashboard-card-head">
+          <div>
+            <h3>Workload</h3>
+          </div>
+          <a href="#" @click.prevent>See All</a>
+        </div>
+        <div class="workload-table">
+          <div class="workload-row head">
+            <span>Name</span><span>Active work</span><span>Overdue</span><span>Status</span><span>Action</span>
+          </div>
+          <div class="workload-row" v-for="person in embers" :key="person.name">
+            <span class="name">{{ person.name }}<small>{{ person.role }}</small></span>
+            <span>{{ person.active }}</span>
+            <span>{{ person.overdue }}</span>
+            <span><em :class="person.stateClass">{{ person.state }}</em></span>
+            <span>...</span>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useTaskStore } from '../../stores/taskStore'
 
 const store = useTaskStore()
+const search = ref('')
+const userName = 'Be'
 const total = computed(() => store.tasks.length || 1)
-const recentTasks = computed(() => store.tasks.slice(0, 8))
+const doneCount = computed(() => store.tasksByColumn.done?.length || 0)
+const inProgressCount = computed(() => store.tasksByColumn.inprogress?.length || 0)
+const overdueCount = computed(() => store.tasksByColumn.todo?.length || 0)
 
-const completionRate = computed(() =>
-  Math.round(((store.tasksByColumn['done']?.length || 0) / total.value) * 100)
-)
+const completionRate = computed(() => Math.round((doneCount.value / total.value) * 100))
 
-const stats = computed(() => [
-  { label: 'Total Tasks',  value: store.tasks.length, icon: '📋', pct: 100, barColor: 'bg-blue-400', textColor: 'text-blue-500', sub: 'All tasks' },
-  { label: 'To Do',        value: store.tasksByColumn['todo']?.length || 0, icon: '📌', pct: Math.round(((store.tasksByColumn['todo']?.length||0)/total.value)*100), barColor: 'bg-gray-400', textColor: 'text-gray-500', sub: 'Pending' },
-  { label: 'In Progress',  value: store.tasksByColumn['inprogress']?.length || 0, icon: '⚡', pct: Math.round(((store.tasksByColumn['inprogress']?.length||0)/total.value)*100), barColor: 'bg-blue-500', textColor: 'text-blue-500', sub: 'Active' },
-  { label: 'Done',         value: store.tasksByColumn['done']?.length || 0, icon: '✅', pct: completionRate.value, barColor: 'bg-green-400', textColor: 'text-green-500', sub: `${completionRate.value}% complete` },
+const counts = computed(() => {
+  const base = { high: 0, medium: 0, low: 0 }
+  store.tasks.forEach((task) => {
+    const key = (task.priority || '').toLowerCase()
+    if (key in base) base[key] += 1
+  })
+  return base
+})
+
+const statusRates = computed(() => ({
+  inProgress: Math.round((inProgressCount.value / total.value) * 100),
+  completed: Math.round((doneCount.value / total.value) * 100),
+  overdue: Math.round((overdueCount.value / total.value) * 100),
+}))
+
+const metrics = computed(() => [
+  { value: 156, label: 'Active Projects', tone: 'tone-blue' },
+  { value: '82%', label: 'Utilization Rate', tone: 'tone-indigo' },
+  { value: '2.4 Days', label: 'Average Time', tone: 'tone-green' },
+  { value: 3, label: 'At Risk Projects', tone: 'tone-pink' },
 ])
 
-const priorityBreakdown = computed(() => {
-  const counts = { High: 0, Medium: 0, Low: 0 }
-  store.tasks.forEach(t => { if (counts[t.priority] !== undefined) counts[t.priority]++ })
-  const max = Math.max(...Object.values(counts), 1)
-  return [
-    { label: 'High',   count: counts.High,   pct: Math.round((counts.High/max)*100),   color: 'text-red-500',    bar: 'bg-red-400' },
-    { label: 'Medium', count: counts.Medium, pct: Math.round((counts.Medium/max)*100), color: 'text-yellow-500', bar: 'bg-yellow-400' },
-    { label: 'Low',    count: counts.Low,    pct: Math.round((counts.Low/max)*100),    color: 'text-green-500',  bar: 'bg-green-400' },
-  ]
-})
-
-const categoryBreakdown = computed(() => {
-  const counts = {}
-  store.tasks.forEach(t => { if (t.category) counts[t.category] = (counts[t.category] || 0) + 1 })
-  const max = Math.max(...Object.values(counts), 1)
-  return Object.entries(counts).map(([label, count]) => ({ label, count, pct: Math.round((count/max)*100) }))
-})
-
-const colMap = {
-  todo:       { label: 'To Do',       cls: 'bg-gray-100 text-gray-600' },
-  inprogress: { label: 'In Progress', cls: 'bg-blue-100 text-blue-600' },
-  inreview:   { label: 'In Review',   cls: 'bg-orange-100 text-orange-600' },
-  done:       { label: 'Done',        cls: 'bg-green-100 text-green-600' },
-}
-const colLabel = id => colMap[id]?.label || id
-const colClass  = id => colMap[id]?.cls || ''
-const priorityClass = p => ({ High: 'bg-red-100 text-red-600', Medium: 'bg-yellow-100 text-yellow-600', Low: 'bg-green-100 text-green-600' }[p] || '')
+const activityHeatmap = [0.2, 0.35, 0.8, 0.75, 0.5, 0.65, 0.7, 0.28, 0.72, 0.5, 0.76, 0.9, 0.78, 0.82, 0.32, 0.75, 0.81, 0.84, 0.69, 0.88, 0.74, 0.6, 0.78, 0.82, 0.85, 0.3, 0.42, 0.2, 0.67, 0.88, 0.23, 0.91, 0.4, 0.37, 0.53]
+const embers = [
+  { name: 'Mark Chen', role: 'Product Manager', active: 12, overdue: 5, state: 'On Track', stateClass: 'state-red' },
+  { name: 'Emily Davis', role: 'UX Researcher', active: 10, overdue: 2, state: 'Under Pressure', stateClass: 'state-green' },
+  { name: 'John Smith', role: 'Frontend Developer', active: 15, overdue: 4, state: 'Sustained', stateClass: 'state-green' },
+  { name: 'Linda Johnson', role: 'Backend Developer', active: 9, overdue: 1, state: 'Overloaded', stateClass: 'state-red' },
+  { name: 'Michael Brown', role: 'QA Specialist', active: 20, overdue: 6, state: 'Balanced', stateClass: 'state-green' },
+]
 </script>
