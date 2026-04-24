@@ -1,7 +1,6 @@
 package com.taskbuddy.dto;
 
 import com.taskbuddy.model.RecurringConfig;
-import com.taskbuddy.model.Subtask;
 import com.taskbuddy.model.Task;
 import lombok.Data;
 

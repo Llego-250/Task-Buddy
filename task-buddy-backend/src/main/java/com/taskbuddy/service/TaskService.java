@@ -100,7 +100,6 @@ public class TaskService {
                 s.setTitle(sr.getTitle());
                 s.setCompleted(sr.isCompleted());
                 s.setHours(sr.getHours());
-                s.setTask(task);
                 task.getSubtasks().add(s);
             });
         }

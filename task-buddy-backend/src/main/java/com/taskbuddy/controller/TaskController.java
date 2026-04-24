@@ -8,7 +8,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -27,7 +26,7 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    public TaskResponse getById(@PathVariable Long id) {
+    public TaskResponse getById(@PathVariable String id) {
         return taskService.getById(id);
     }
 
@@ -38,23 +37,23 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public TaskResponse update(@PathVariable Long id, @Valid @RequestBody TaskRequest req) {
+    public TaskResponse update(@PathVariable String id, @Valid @RequestBody TaskRequest req) {
         return taskService.update(id, req);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable String id) {
         taskService.delete(id);
     }
 
     @PatchMapping("/{id}/toggle")
-    public TaskResponse toggleComplete(@PathVariable Long id) {
+    public TaskResponse toggleComplete(@PathVariable String id) {
         return taskService.toggleComplete(id);
     }
 
     @PatchMapping("/{id}/timer")
-    public TaskResponse updateTimer(@PathVariable Long id, @RequestParam long seconds) {
+    public TaskResponse updateTimer(@PathVariable String id, @RequestParam long seconds) {
         return taskService.updateTimer(id, seconds);
     }
 

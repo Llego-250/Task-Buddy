@@ -22,14 +22,14 @@ public class NotificationService {
     private final TaskRepository taskRepository;
 
     public Notification create(NotificationRequest req) {
-        Task task = taskRepository.findById(req.getTaskId())
-                .orElseThrow(() -> new ResourceNotFoundException("Task not found: " + req.getTaskId()));
-        Notification n = new Notification();
-        n.setTask(task);
-        n.setMessage(req.getMessage() != null ? req.getMessage()
-                : "Reminder: " + task.getTitle() + " is due soon.");
-        n.setRemindAt(req.getRemindAt());
-        return notificationRepository.save(n);
+    Task task = taskRepository.findById(req.getTaskId())
+        .orElseThrow(() -> new ResourceNotFoundException("Task not found: " + req.getTaskId()));
+    Notification n = new Notification();
+    n.setTaskId(task.getId());
+    n.setMessage(req.getMessage() != null ? req.getMessage()
+        : "Reminder: " + task.getTitle() + " is due soon.");
+    n.setRemindAt(req.getRemindAt());
+    return notificationRepository.save(n);
     }
 
     public List<Notification> getUnread() {
@@ -40,14 +40,19 @@ public class NotificationService {
         return notificationRepository.findByRemindAtBeforeAndReadFalse(LocalDateTime.now());
     }
 
-    public Notification markRead(Long id) {
+    public Notification markRead(String id) {
         Notification n = notificationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Notification not found: " + id));
         n.setRead(true);
-        return notificationRepository.save(n);
+        return notification_repository_save(n);
     }
 
-    public void delete(Long id) {
+    public void delete(String id) {
         notificationRepository.deleteById(id);
+    }
+
+    // helper to avoid potential name clashes when editing
+    private Notification notification_repository_save(Notification n) {
+        return notificationRepository.save(n);
     }
 }

@@ -34,13 +34,13 @@ public class NotificationController {
     }
 
     @PatchMapping("/{id}/read")
-    public Notification markRead(@PathVariable Long id) {
+    public Notification markRead(@PathVariable String id) {
         return notificationService.markRead(id);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable String id) {
         notificationService.delete(id);
     }
 }

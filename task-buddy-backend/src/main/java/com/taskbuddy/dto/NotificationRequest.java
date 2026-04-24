@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class NotificationRequest {
 
     @NotNull
-    private Long taskId;
+    private String taskId;
 
     private String message;
 
