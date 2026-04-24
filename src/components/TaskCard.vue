@@ -1,16 +1,13 @@
 <template>
   <div
-  class="task-card bg-white rounded-2xl p-5 border border-gray-100 cursor-pointer group relative select-none"
+  class="task-card bg-white rounded-2xl p-4 border border-gray-100 cursor-pointer group relative select-none"
   :class="dark ? 'bg-gray-800 border-gray-700' : ''"
     draggable="true"
     :data-task-id="task.id"
+    @click="$emit('preview', task)"
     @dragstart.stop="onDragStart"
   >
-    <!-- Priority + Category + Actions row -->
-    <div class="flex items-center gap-2 mb-3">
-      <span class="text-xs font-semibold px-2 py-0.5 rounded-full" :class="priorityClass">{{ task.priority }}</span>
-      <span v-if="task.category" class="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{{ task.category }}</span>
-      <div class="ml-auto flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+    <div class="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
           @click.stop="$emit('edit', task)"
           class="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-500 transition-colors"
@@ -27,33 +24,20 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
           </svg>
         </button>
-      </div>
     </div>
 
     <!-- Image card -->
     <template v-if="task.image">
-      <img :src="task.image" :alt="task.title" class="w-full h-40 object-cover rounded-xl mb-3 shadow-sm" />
-      <h3 class="font-semibold text-gray-800 text-sm mb-1 line-clamp-2" :class="dark ? 'text-gray-100' : ''">{{ task.title }}</h3>
-      <p class="text-xs text-purple-500 mb-3 font-medium">{{ task.date }}</p>
-    </template>
-
-    <!-- Assignee card -->
-    <template v-else-if="task.assignee">
-      <div class="flex items-center gap-3 mb-2">
-        <img :src="task.assignee.avatar" :alt="task.assignee.name" class="w-9 h-9 rounded-full object-cover ring-2 ring-white shadow-sm" />
-        <div>
-          <p class="text-sm font-semibold leading-tight" :class="dark ? 'text-gray-100' : 'text-gray-800'">{{ task.assignee.name }}</p>
-          <p class="text-xs text-purple-500 font-medium">{{ task.date }}</p>
-        </div>
-      </div>
-      <p v-if="task.description" class="text-xs leading-relaxed line-clamp-2 mb-3" :class="dark ? 'text-gray-400' : 'text-gray-500'">{{ task.description }}</p>
+      <img :src="task.image" :alt="task.title" class="w-full h-36 object-cover rounded-xl mb-3 shadow-sm" />
+      <h3 class="font-semibold text-gray-800 text-[20px] leading-tight mb-2 line-clamp-2" :class="dark ? 'text-gray-100' : ''">{{ task.title }}</h3>
+      <p class="text-xs text-[#7f8ba4] mb-3 font-semibold">{{ task.date }}</p>
     </template>
 
     <!-- Title-only card -->
     <template v-else>
-      <h3 class="font-semibold text-sm mb-1 line-clamp-2" :class="dark ? 'text-gray-100' : 'text-gray-800'">{{ task.title }}</h3>
-      <p class="text-xs text-purple-500 font-medium mb-1">{{ task.date }}</p>
-      <p v-if="task.description" class="text-xs leading-relaxed line-clamp-2 mb-3" :class="dark ? 'text-gray-400' : 'text-gray-500'">{{ task.description }}</p>
+      <h3 class="font-semibold text-[20px] leading-tight mb-2 line-clamp-2" :class="dark ? 'text-gray-100' : 'text-gray-800'">{{ task.title }}</h3>
+      <p class="text-xs text-[#7f8ba4] font-semibold mb-2">{{ task.date }}</p>
+      <p v-if="task.description" class="text-sm leading-relaxed line-clamp-2 mb-3" :class="dark ? 'text-gray-400' : 'text-gray-500'">{{ task.description }}</p>
     </template>
 
     <!-- Due date -->
@@ -65,44 +49,28 @@
     </p>
 
     <!-- Footer -->
-    <div class="flex items-center justify-between mt-2 pt-2 border-t" :class="dark ? 'border-gray-700' : 'border-gray-50'">
+    <div class="flex items-center justify-between mt-2 pt-3 border-t" :class="dark ? 'border-gray-700' : 'border-gray-100'">
       <ChannelIcon :icon="task.channel.icon" :name="task.channel.name" />
-      <div class="flex items-center gap-2">
-        <div class="flex -space-x-1.5">
-          <img
-            v-for="(m, i) in task.members.slice(0, 2)" :key="i"
-            :src="m"
-            class="w-6 h-6 rounded-full border-2 border-white object-cover shadow-sm"
-          />
-        </div>
-        <span v-if="task.extraMembers > 0" class="text-xs text-gray-500 font-semibold ml-0.5">+{{ task.extraMembers }}</span>
-        <div v-else-if="task.members.length === 0" class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
-          <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-          </svg>
-        </div>
+      <div class="flex items-center gap-2 text-xs font-semibold text-gray-400">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1"/>
+        </svg>
+        Personal
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
 import ChannelIcon from './ChannelIcon.vue'
 
 const props = defineProps({ task: Object, dark: Boolean })
-defineEmits(['edit', 'delete'])
+defineEmits(['edit', 'delete', 'preview'])
 
 function onDragStart(e) {
   e.dataTransfer.setData('taskId', String(props.task.id))
   e.dataTransfer.effectAllowed = 'move'
 }
-
-const priorityClass = computed(() => ({
-  High:   'bg-red-100 text-red-600',
-  Medium: 'bg-yellow-100 text-yellow-600',
-  Low:    'bg-green-100 text-green-600',
-}[props.task.priority] || 'bg-gray-100 text-gray-500'))
 </script>
 
 <style scoped>

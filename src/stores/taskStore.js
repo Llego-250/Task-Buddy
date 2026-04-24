@@ -3,7 +3,16 @@ import { ref, computed } from 'vue'
 import { INITIAL_TASKS, COLUMNS } from '../services/taskService'
 
 export const useTaskStore = defineStore('task', () => {
-  const tasks = ref(JSON.parse(localStorage.getItem('pt_tasks') || 'null') || INITIAL_TASKS)
+  const normalizeTask = (task) => ({
+    ...task,
+    title: task.title || task.assignee?.name || 'Untitled',
+    assignee: null,
+    members: [],
+    extraMembers: 0,
+  })
+
+  const savedTasks = JSON.parse(localStorage.getItem('pt_tasks') || 'null')
+  const tasks = ref((savedTasks || INITIAL_TASKS).map(normalizeTask))
   const darkMode = ref(localStorage.getItem('pt_dark') === 'true')
   const activeView = ref('table')
   const searchQuery = ref('')
@@ -20,7 +29,7 @@ export const useTaskStore = defineStore('task', () => {
         if (filterPriority.value && t.priority !== filterPriority.value) return false
         if (filterCategory.value && t.category !== filterCategory.value) return false
         if (q) {
-          const name = t.title || t.assignee?.name || ''
+          const name = t.title || ''
           const desc = t.description || ''
           return name.toLowerCase().includes(q) || desc.toLowerCase().includes(q)
         }
@@ -36,7 +45,7 @@ export const useTaskStore = defineStore('task', () => {
       if (filterPriority.value && t.priority !== filterPriority.value) return false
       if (filterCategory.value && t.category !== filterCategory.value) return false
       if (q) {
-        const name = t.title || t.assignee?.name || ''
+        const name = t.title || ''
         const desc = t.description || ''
         return name.toLowerCase().includes(q) || desc.toLowerCase().includes(q)
       }
@@ -45,7 +54,7 @@ export const useTaskStore = defineStore('task', () => {
   })
 
   function addTask(task) {
-    tasks.value.push({ id: Date.now(), ...task })
+    tasks.value.push(normalizeTask({ id: Date.now(), ...task }))
     save()
   }
 

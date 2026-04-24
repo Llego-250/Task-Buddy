@@ -1,25 +1,25 @@
 <template>
   <aside
-    class="w-56 min-h-screen flex flex-col py-6 px-3 shrink-0 transition-colors"
+    class="w-64 min-h-screen flex flex-col py-6 px-4 shrink-0 transition-colors"
     :class="store.darkMode ? 'bg-gray-900 border-r border-gray-800' : 'bg-white border-r border-gray-100'"
   >
     <!-- Logo -->
-    <div class="flex items-center gap-2.5 mb-8 px-2">
-      <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm">
+    <div class="flex items-center gap-2.5 mb-10 px-2">
+      <div class="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center shadow-sm">
         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 10h16M4 14h8"/>
         </svg>
       </div>
-      <span class="font-bold text-blue-600 text-base tracking-tight">TaskBuddy</span>
+      <span class="font-bold text-blue-600 text-xl tracking-tight">TaskBuddy</span>
     </div>
 
     <!-- MENU -->
-    <p class="text-[10px] font-bold tracking-[0.12em] mb-2 px-2" :class="store.darkMode ? 'text-gray-600' : 'text-gray-400'">MENU</p>
-    <nav class="flex flex-col gap-0.5 mb-6">
+    <p class="text-[10px] font-bold tracking-[0.14em] mb-2 px-2" :class="store.darkMode ? 'text-gray-600' : 'text-gray-400'">MENU</p>
+    <nav class="flex flex-col gap-1 mb-7">
       <router-link
         v-for="item in menuItems" :key="item.to"
         :to="item.to"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all"
+        class="flex items-center gap-3 px-3 py-3 rounded-xl text-[15px] font-medium transition-all"
         :class="$route.path === item.to
           ? 'bg-blue-600 text-white shadow-sm'
           : store.darkMode ? 'text-gray-400 hover:bg-gray-800 hover:text-gray-200' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'"
@@ -30,11 +30,11 @@
     </nav>
 
     <!-- MESSAGES -->
-    <p class="text-[10px] font-bold tracking-[0.12em] mb-2 px-2" :class="store.darkMode ? 'text-gray-600' : 'text-gray-400'">MESSAGES</p>
-    <nav class="flex flex-col gap-0.5 flex-1 overflow-y-auto">
+    <p class="text-[10px] font-bold tracking-[0.14em] mb-2 px-2" :class="store.darkMode ? 'text-gray-600' : 'text-gray-400'">MESSAGES</p>
+    <nav class="flex flex-col gap-1 flex-1 overflow-y-auto">
       <button
         v-for="msg in messages" :key="msg.id"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all w-full text-left"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[15px] font-medium transition-all w-full text-left"
         :class="store.darkMode ? 'text-gray-400 hover:bg-gray-800 hover:text-gray-200' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'"
       >
         <ChannelIcon :icon="msg.icon" :name="msg.name" :show-name="false" />
@@ -44,10 +44,10 @@
     </nav>
 
     <!-- Bottom -->
-    <div class="flex flex-col gap-0.5 mt-4 pt-4 border-t" :class="store.darkMode ? 'border-gray-800' : 'border-gray-100'">
+    <div class="flex flex-col gap-1 mt-5 pt-5 border-t" :class="store.darkMode ? 'border-gray-800' : 'border-gray-100'">
       <router-link
         to="/settings"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all"
+        class="flex items-center gap-3 px-3 py-3 rounded-xl text-[15px] font-medium transition-all"
         :class="$route.path === '/settings'
           ? 'bg-blue-600 text-white'
           : store.darkMode ? 'text-gray-400 hover:bg-gray-800 hover:text-gray-200' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'"
@@ -61,7 +61,7 @@
 
       <button
         @click="store.toggleDark()"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all w-full text-left"
+        class="flex items-center gap-3 px-3 py-3 rounded-xl text-[15px] font-medium transition-all w-full text-left"
         :class="store.darkMode ? 'text-gray-400 hover:bg-gray-800 hover:text-gray-200' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'"
       >
         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

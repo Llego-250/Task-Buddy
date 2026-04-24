@@ -1,23 +1,23 @@
 <template>
   <div
-    class="kanban-column flex flex-col flex-1 min-w-[280px] max-w-[340px] rounded-2xl p-4 transition-all"
-    :class="isDragOver ? 'bg-blue-50 ring-2 ring-blue-200 ring-inset' : 'bg-white/30'"
+    class="kanban-column flex flex-col flex-1 min-w-[280px] max-w-[340px] rounded-2xl p-2 transition-all"
+    :class="isDragOver ? 'bg-blue-50 ring-2 ring-blue-200 ring-inset' : 'bg-transparent'"
     @dragover.prevent="isDragOver = true"
     @dragleave.self="isDragOver = false"
     @drop.prevent="onDrop($event)"
   >
     <!-- Column Header -->
-    <div class="flex items-center justify-between mb-5 px-1">
+    <div class="flex items-center justify-between mb-4 px-1">
       <div class="flex items-center gap-2">
-        <span class="font-semibold text-sm" :class="column.color">{{ column.label }}</span>
-        <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-white shadow-sm" :class="countClass">
-          {{ String(tasks.length).padStart(2, '0') }}
+        <span class="font-semibold text-xl leading-none" :class="column.color">{{ column.label }}</span>
+        <span class="text-sm font-semibold text-gray-400">
+          ({{ String(tasks.length).padStart(2, '0') }})
         </span>
       </div>
       <div class="flex items-center gap-1.5">
         <button
           @click="$emit('add', column.id)"
-          class="w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors text-base leading-none font-light"
+          class="w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors text-lg leading-none font-light"
         >+</button>
         <button class="flex items-center gap-0.5 p-1 rounded-lg hover:bg-gray-100 transition-colors">
           <span class="w-1 h-1 rounded-full bg-gray-300"></span>
@@ -36,6 +36,7 @@
         :dark="dark"
         @edit="$emit('edit', $event)"
         @delete="$emit('delete', $event)"
+        @preview="$emit('preview', $event)"
       />
       <!-- Empty state -->
       <div
@@ -49,20 +50,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import TaskCard from './TaskCard.vue'
 
 const props = defineProps({ column: Object, tasks: Array, dark: Boolean })
-const emit = defineEmits(['add', 'edit', 'delete', 'drop'])
+const emit = defineEmits(['add', 'edit', 'delete', 'drop', 'preview'])
 
 const isDragOver = ref(false)
-
-const countClass = computed(() => ({
-  'text-gray-700':   props.column.id === 'todo',
-  'text-blue-500':   props.column.id === 'inprogress',
-  'text-orange-500': props.column.id === 'inreview',
-  'text-green-500':  props.column.id === 'done',
-}))
 
 function onDrop(e) {
   isDragOver.value = false

@@ -11,7 +11,10 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #f9fafb;
+  background: #f6f7fb;
+  color: #1f2937;
+  font-size: 14px;
+  line-height: 1.45;
 }
 
 /* Smooth scrollbar */
@@ -62,17 +65,48 @@ button:active {
 
 /* Kanban column styling */
 .kanban-column {
-  min-width: 280px;
-  max-width: 320px;
+  min-width: 290px;
+  max-width: 340px;
+  padding: 0.35rem 0.35rem 0.5rem;
 }
 
 /* Task card animations */
 .task-card {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 16px;
+  border: 1px solid #edf0f5;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.03);
+  padding: 1rem;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .task-card:hover {
   transform: translateY(-2px);
+  border-color: #e5eaf2;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08), 0 3px 8px rgba(15, 23, 42, 0.05);
+}
+
+/* Typography + spacing hierarchy inside task cards */
+.task-card h3 {
+  font-size: 1.62rem;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.task-card p {
+  line-height: 1.5;
+}
+
+.task-card .text-xs {
+  letter-spacing: 0.01em;
+}
+
+.task-card [class*="text-[#7f8ba4]"] {
+  font-weight: 600;
+}
+
+.task-card .border-t {
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
 }
 
 /* Modal backdrop */
@@ -208,6 +242,16 @@ tbody td {
 
 tbody tr:hover {
   background-color: #f9fafb;
+}
+
+/* Page-level layout polish for Tasks view */
+header {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+main {
+  background: #f6f7fb;
 }
 
 /* Avatar group */

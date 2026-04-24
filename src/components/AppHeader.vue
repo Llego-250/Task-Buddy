@@ -1,13 +1,13 @@
 <template>
   <header
-    class="flex items-center justify-between px-8 py-5 border-b shrink-0 transition-colors"
-    :class="store.darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'"
+    class="flex items-center justify-between px-8 py-4 border-b shrink-0 transition-colors"
+    :class="store.darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'"
   >
-    <h1 class="text-2xl font-bold tracking-tight" :class="store.darkMode ? 'text-white' : 'text-gray-800'">
+    <h1 class="text-[42px] font-bold tracking-[-0.02em] leading-none" :class="store.darkMode ? 'text-white' : 'text-gray-800'">
       {{ title }}
     </h1>
 
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2.5">
       <!-- Messages icon -->
       <button
         class="relative w-10 h-10 flex items-center justify-center rounded-full transition-colors"
@@ -31,7 +31,7 @@
       </button>
 
       <!-- Avatar -->
-      <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm cursor-pointer select-none ring-2 ring-transparent hover:ring-green-300 transition-all ml-2">
+      <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm cursor-pointer select-none ring-2 ring-transparent hover:ring-green-300 transition-all ml-1">
         O
       </div>
     </div>

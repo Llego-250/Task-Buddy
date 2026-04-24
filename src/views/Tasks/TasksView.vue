@@ -1,16 +1,16 @@
 <template>
-  <div class="flex flex-col h-full" :class="store.darkMode ? 'bg-gray-900' : 'bg-gray-50'">
+  <div class="flex flex-col h-full" :class="store.darkMode ? 'bg-gray-900' : 'bg-[#f6f7fb]'">
 
     <!-- Sub-header -->
-    <div class="flex items-center justify-between px-8 py-4 border-b shrink-0 flex-wrap gap-3 transition-colors" :class="store.darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'">
+    <div class="flex items-center justify-between px-8 pt-4 pb-3 border-b shrink-0 flex-wrap gap-3 transition-colors" :class="store.darkMode ? 'bg-gray-900 border-gray-800' : 'bg-[#f6f7fb] border-gray-200'">
       <!-- View Tabs -->
-      <div class="flex items-center gap-1 rounded-xl p-1" :class="store.darkMode ? 'bg-gray-800' : 'bg-gray-100'">
+      <div class="flex items-center gap-1 rounded-xl p-1" :class="store.darkMode ? 'bg-gray-800' : 'bg-white border border-gray-200 shadow-sm'">
         <button
           v-for="tab in tabs" :key="tab.id"
           @click="activeTab = tab.id"
           class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
           :class="activeTab === tab.id
-            ? 'bg-white text-gray-800 shadow-sm'
+            ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100'
             : store.darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'"
         >
           <component :is="tab.icon" class="w-4 h-4" />
@@ -19,37 +19,18 @@
       </div>
 
       <div class="flex items-center gap-3 flex-wrap">
-        <!-- Search -->
-        <div class="relative">
-          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-          <input v-model="store.searchQuery" placeholder="Search tasks..." class="pl-9 pr-3 py-1.5 text-sm border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 w-72 transition-colors" :class="store.darkMode ? 'bg-gray-800 border-gray-700 text-gray-200 placeholder-gray-500' : 'bg-white border-gray-200 text-gray-700'" />
+        <div class="px-3 py-1.5 rounded-full text-sm font-semibold text-gray-600 bg-white border border-gray-200">
+          My Workspace
         </div>
-        <!-- Priority filter -->
-        <select v-model="store.filterPriority" class="text-sm border rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" :class="store.darkMode ? 'bg-gray-800 border-gray-700 text-gray-200' : 'bg-white border-gray-200 text-gray-700'">
-          <option value="">All Priorities</option>
-          <option v-for="p in PRIORITIES" :key="p" :value="p">{{ p }}</option>
-        </select>
-        <!-- Category filter -->
-        <select v-model="store.filterCategory" class="text-sm border rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" :class="store.darkMode ? 'bg-gray-800 border-gray-700 text-gray-200' : 'bg-white border-gray-200 text-gray-700'">
-          <option value="">All Categories</option>
-          <option v-for="c in CATEGORIES" :key="c" :value="c">{{ c }}</option>
-        </select>
-        <!-- Team Avatars -->
-        <div class="flex items-center gap-2 border-r border-gray-200 pr-3">
-          <div class="flex -space-x-2">
-            <img v-for="(a, i) in teamAvatars.slice(0,4)" :key="i" :src="a" class="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm" />
-          </div>
-          <span class="text-sm font-semibold text-gray-600">42+</span>
-        </div>
-        <button class="w-8 h-8 flex items-center justify-center rounded-full border-2 border-dashed border-gray-300 text-gray-400 hover:border-blue-400 hover:text-blue-400 transition-colors text-lg">+</button>
-        <button @click="openCreate" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
-          <span class="text-lg leading-none">+</span> Create Task
+        <button @click="openCreate" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors shadow-sm">
+          <span class="text-lg leading-none">+</span>
+          Create Task
         </button>
       </div>
     </div>
 
     <!-- KANBAN VIEW -->
-    <div v-if="activeTab === 'table'" class="flex gap-6 p-6 overflow-x-auto flex-1">
+    <div v-if="activeTab === 'table'" class="flex gap-6 px-6 py-5 overflow-x-auto flex-1">
       <KanbanColumn
         v-for="col in COLUMNS"
         :key="col.id"
@@ -59,6 +40,7 @@
         @add="openCreate(col.id)"
         @edit="openEdit"
         @delete="store.deleteTask($event)"
+        @preview="openPreview"
         @drop="onDrop"
       />
     </div>
@@ -83,10 +65,7 @@
               class="border-b border-gray-50 hover:bg-gray-50 transition-colors"
             >
               <td class="px-4 py-3">
-                <div class="flex items-center gap-2">
-                  <img v-if="task.assignee" :src="task.assignee.avatar" class="w-7 h-7 rounded-full object-cover" />
-                  <span class="font-medium text-gray-800">{{ task.title || task.assignee?.name || 'Untitled' }}</span>
-                </div>
+                <span class="font-medium text-gray-800 cursor-pointer hover:text-blue-600 transition-colors" @click="openPreview(task)">{{ task.title || 'Untitled' }}</span>
               </td>
               <td class="px-4 py-3">
                 <span class="text-xs px-2 py-0.5 rounded-full font-medium" :class="colClass(task.columnId)">{{ colLabel(task.columnId) }}</span>
@@ -116,7 +95,7 @@
     </div>
 
     <!-- KANBAN (same as table but labeled differently) -->
-    <div v-else class="flex gap-6 p-6 overflow-x-auto flex-1">
+    <div v-else class="flex gap-6 px-6 py-5 overflow-x-auto flex-1">
       <KanbanColumn
         v-for="col in COLUMNS"
         :key="col.id"
@@ -126,6 +105,7 @@
         @add="openCreate(col.id)"
         @edit="openEdit"
         @delete="store.deleteTask($event)"
+        @preview="openPreview"
         @drop="onDrop"
       />
     </div>
@@ -164,6 +144,33 @@
         </div>
       </div>
     </div>
+
+    <!-- TASK PREVIEW -->
+    <div v-if="previewTask" class="fixed inset-0 bg-black/35 flex items-center justify-center z-50 modal-backdrop" @click.self="previewTask = null">
+      <div class="bg-white rounded-2xl p-6 w-full max-w-lg shadow-2xl modal-content">
+        <div class="flex items-start justify-between mb-4 gap-3">
+          <div>
+            <h2 class="text-xl font-bold text-gray-800">{{ previewTask.title || 'Untitled Task' }}</h2>
+            <p class="text-xs text-gray-400 mt-1">{{ previewTask.date }}</p>
+          </div>
+          <button @click="previewTask = null" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs px-2 py-1 rounded-full font-semibold" :class="priorityClass(previewTask.priority)">{{ previewTask.priority }}</span>
+          <span v-if="previewTask.category" class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600 font-medium">{{ previewTask.category }}</span>
+          <span class="text-xs px-2 py-1 rounded-full font-medium" :class="colClass(previewTask.columnId)">{{ colLabel(previewTask.columnId) }}</span>
+        </div>
+
+        <img v-if="previewTask.image" :src="previewTask.image" :alt="previewTask.title" class="w-full h-52 object-cover rounded-xl mb-4" />
+
+        <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+          <p class="text-sm leading-relaxed text-gray-700 whitespace-pre-wrap">{{ previewTask.description || 'No description added for this task yet.' }}</p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -177,17 +184,10 @@ const store = useTaskStore()
 const activeTab = ref('table')
 const showModal = ref(false)
 const editId = ref(null)
+const previewTask = ref(null)
 
 const defaultForm = () => ({ title: '', description: '', columnId: 'todo', priority: 'Medium', category: '', dueDate: '' })
 const form = ref(defaultForm())
-
-const teamAvatars = [
-  'https://i.pravatar.cc/32?img=20',
-  'https://i.pravatar.cc/32?img=21',
-  'https://i.pravatar.cc/32?img=22',
-  'https://i.pravatar.cc/32?img=23',
-  'https://i.pravatar.cc/32?img=24',
-]
 
 // Tab icons
 const TableIcon  = { render: () => h('svg', { class: 'w-4 h-4', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M3 10h18M3 14h18M10 4v16M4 4h16a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z' })]) }
@@ -220,7 +220,7 @@ function openCreate(colId = 'todo') {
 function openEdit(task) {
   editId.value = task.id
   form.value = {
-    title: task.title || task.assignee?.name || '',
+    title: task.title || '',
     description: task.description || '',
     columnId: task.columnId,
     priority: task.priority || 'Medium',
@@ -249,15 +249,16 @@ function submitTask() {
       priority: form.value.priority,
       category: form.value.category,
       dueDate: form.value.dueDate,
-      assignee: null,
       date: new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' }) + '  ' + new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
       channel: { name: 'GitHub', icon: 'github' },
-      members: [],
-      extraMembers: 0,
       image: null,
     })
   }
   showModal.value = false
+}
+
+function openPreview(task) {
+  previewTask.value = task
 }
 
 function onDrop({ taskId, colId }) {
