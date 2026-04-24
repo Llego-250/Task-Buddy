@@ -1,0 +1,266 @@
+<template>
+  <div class="flex flex-col h-full" :class="store.darkMode ? 'bg-gray-900' : 'bg-gray-50'">
+
+    <!-- Sub-header -->
+    <div class="flex items-center justify-between px-8 py-4 border-b shrink-0 flex-wrap gap-3 transition-colors" :class="store.darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'">
+      <!-- View Tabs -->
+      <div class="flex items-center gap-1 rounded-xl p-1" :class="store.darkMode ? 'bg-gray-800' : 'bg-gray-100'">
+        <button
+          v-for="tab in tabs" :key="tab.id"
+          @click="activeTab = tab.id"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+          :class="activeTab === tab.id
+            ? 'bg-white text-gray-800 shadow-sm'
+            : store.darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'"
+        >
+          <component :is="tab.icon" class="w-4 h-4" />
+          {{ tab.label }}
+        </button>
+      </div>
+
+      <div class="flex items-center gap-3 flex-wrap">
+        <!-- Search -->
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input v-model="store.searchQuery" placeholder="Search tasks..." class="pl-9 pr-3 py-1.5 text-sm border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 w-72 transition-colors" :class="store.darkMode ? 'bg-gray-800 border-gray-700 text-gray-200 placeholder-gray-500' : 'bg-white border-gray-200 text-gray-700'" />
+        </div>
+        <!-- Priority filter -->
+        <select v-model="store.filterPriority" class="text-sm border rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" :class="store.darkMode ? 'bg-gray-800 border-gray-700 text-gray-200' : 'bg-white border-gray-200 text-gray-700'">
+          <option value="">All Priorities</option>
+          <option v-for="p in PRIORITIES" :key="p" :value="p">{{ p }}</option>
+        </select>
+        <!-- Category filter -->
+        <select v-model="store.filterCategory" class="text-sm border rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" :class="store.darkMode ? 'bg-gray-800 border-gray-700 text-gray-200' : 'bg-white border-gray-200 text-gray-700'">
+          <option value="">All Categories</option>
+          <option v-for="c in CATEGORIES" :key="c" :value="c">{{ c }}</option>
+        </select>
+        <!-- Team Avatars -->
+        <div class="flex items-center gap-2 border-r border-gray-200 pr-3">
+          <div class="flex -space-x-2">
+            <img v-for="(a, i) in teamAvatars.slice(0,4)" :key="i" :src="a" class="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm" />
+          </div>
+          <span class="text-sm font-semibold text-gray-600">42+</span>
+        </div>
+        <button class="w-8 h-8 flex items-center justify-center rounded-full border-2 border-dashed border-gray-300 text-gray-400 hover:border-blue-400 hover:text-blue-400 transition-colors text-lg">+</button>
+        <button @click="openCreate" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
+          <span class="text-lg leading-none">+</span> Create Task
+        </button>
+      </div>
+    </div>
+
+    <!-- KANBAN VIEW -->
+    <div v-if="activeTab === 'table'" class="flex gap-6 p-6 overflow-x-auto flex-1">
+      <KanbanColumn
+        v-for="col in COLUMNS"
+        :key="col.id"
+        :column="col"
+        :tasks="store.tasksByColumn[col.id] || []"
+        :dark="store.darkMode"
+        @add="openCreate(col.id)"
+        @edit="openEdit"
+        @delete="store.deleteTask($event)"
+        @drop="onDrop"
+      />
+    </div>
+
+    <!-- LIST VIEW -->
+    <div v-else-if="activeTab === 'list'" class="flex-1 overflow-y-auto p-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-100 text-left">
+              <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Task</th>
+              <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+              <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Priority</th>
+              <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Category</th>
+              <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Date</th>
+              <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="task in store.allFiltered" :key="task.id"
+              class="border-b border-gray-50 hover:bg-gray-50 transition-colors"
+            >
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                  <img v-if="task.assignee" :src="task.assignee.avatar" class="w-7 h-7 rounded-full object-cover" />
+                  <span class="font-medium text-gray-800">{{ task.title || task.assignee?.name || 'Untitled' }}</span>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <span class="text-xs px-2 py-0.5 rounded-full font-medium" :class="colClass(task.columnId)">{{ colLabel(task.columnId) }}</span>
+              </td>
+              <td class="px-4 py-3">
+                <span class="text-xs px-2 py-0.5 rounded-full font-semibold" :class="priorityClass(task.priority)">{{ task.priority }}</span>
+              </td>
+              <td class="px-4 py-3 text-xs text-gray-500">{{ task.category }}</td>
+              <td class="px-4 py-3 text-xs text-gray-400">{{ task.date }}</td>
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                  <button @click="openEdit(task)" class="text-gray-400 hover:text-blue-500 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                  </button>
+                  <button @click="store.deleteTask(task.id)" class="text-gray-400 hover:text-red-500 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr v-if="!store.allFiltered.length">
+              <td colspan="6" class="px-4 py-8 text-center text-gray-400 text-sm">No tasks found</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- KANBAN (same as table but labeled differently) -->
+    <div v-else class="flex gap-6 p-6 overflow-x-auto flex-1">
+      <KanbanColumn
+        v-for="col in COLUMNS"
+        :key="col.id"
+        :column="col"
+        :tasks="store.tasksByColumn[col.id] || []"
+        :dark="store.darkMode"
+        @add="openCreate(col.id)"
+        @edit="openEdit"
+        @delete="store.deleteTask($event)"
+        @drop="onDrop"
+      />
+    </div>
+
+    <!-- CREATE / EDIT MODAL -->
+    <div v-if="showModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 modal-backdrop" @click.self="showModal = false">
+      <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl modal-content">
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="text-lg font-bold text-gray-800">{{ editId ? 'Edit Task' : 'Create Task' }}</h2>
+          <button @click="showModal = false" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="flex flex-col gap-3">
+          <input v-model="form.title" placeholder="Task title" class="border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" />
+          <textarea v-model="form.description" placeholder="Description (optional)" rows="3" class="border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"></textarea>
+          <div class="grid grid-cols-2 gap-3">
+            <select v-model="form.columnId" class="border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+              <option v-for="col in COLUMNS" :key="col.id" :value="col.id">{{ col.label }}</option>
+            </select>
+            <select v-model="form.priority" class="border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+              <option v-for="p in PRIORITIES" :key="p" :value="p">{{ p }} Priority</option>
+            </select>
+            <select v-model="form.category" class="border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+              <option value="">No Category</option>
+              <option v-for="c in CATEGORIES" :key="c" :value="c">{{ c }}</option>
+            </select>
+            <input v-model="form.dueDate" type="date" class="border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" />
+          </div>
+        </div>
+        <div class="flex gap-2 mt-5 justify-end">
+          <button @click="showModal = false" class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-xl transition-colors font-medium">Cancel</button>
+          <button @click="submitTask" class="px-5 py-2 text-sm bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-sm">
+            {{ editId ? 'Save Changes' : 'Create Task' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, h } from 'vue'
+import { useTaskStore } from '../../stores/taskStore'
+import { COLUMNS, PRIORITIES, CATEGORIES } from '../../services/taskService'
+import KanbanColumn from '../../components/KanbanColumn.vue'
+
+const store = useTaskStore()
+const activeTab = ref('table')
+const showModal = ref(false)
+const editId = ref(null)
+
+const defaultForm = () => ({ title: '', description: '', columnId: 'todo', priority: 'Medium', category: '', dueDate: '' })
+const form = ref(defaultForm())
+
+const teamAvatars = [
+  'https://i.pravatar.cc/32?img=20',
+  'https://i.pravatar.cc/32?img=21',
+  'https://i.pravatar.cc/32?img=22',
+  'https://i.pravatar.cc/32?img=23',
+  'https://i.pravatar.cc/32?img=24',
+]
+
+// Tab icons
+const TableIcon  = { render: () => h('svg', { class: 'w-4 h-4', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M3 10h18M3 14h18M10 4v16M4 4h16a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z' })]) }
+const ListIcon   = { render: () => h('svg', { class: 'w-4 h-4', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M4 6h16M4 10h16M4 14h16M4 18h16' })]) }
+const KanbanIcon = { render: () => h('svg', { class: 'w-4 h-4', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2' })]) }
+
+const tabs = [
+  { id: 'table',  label: 'Table',     icon: TableIcon },
+  { id: 'list',   label: 'List View', icon: ListIcon },
+  { id: 'kanban', label: 'Kanban',    icon: KanbanIcon },
+]
+
+const colMap = {
+  todo:       { label: 'To Do',       cls: 'bg-gray-100 text-gray-600' },
+  inprogress: { label: 'In Progress', cls: 'bg-blue-100 text-blue-600' },
+  inreview:   { label: 'In Review',   cls: 'bg-orange-100 text-orange-600' },
+  done:       { label: 'Done',        cls: 'bg-green-100 text-green-600' },
+}
+const colLabel = id => colMap[id]?.label || id
+const colClass  = id => colMap[id]?.cls || ''
+const priorityClass = p => ({ High: 'bg-red-100 text-red-600', Medium: 'bg-yellow-100 text-yellow-600', Low: 'bg-green-100 text-green-600' }[p] || '')
+
+function openCreate(colId = 'todo') {
+  editId.value = null
+  form.value = defaultForm()
+  form.value.columnId = colId
+  showModal.value = true
+}
+
+function openEdit(task) {
+  editId.value = task.id
+  form.value = {
+    title: task.title || task.assignee?.name || '',
+    description: task.description || '',
+    columnId: task.columnId,
+    priority: task.priority || 'Medium',
+    category: task.category || '',
+    dueDate: task.dueDate || '',
+  }
+  showModal.value = true
+}
+
+function submitTask() {
+  if (!form.value.title.trim()) return
+  if (editId.value) {
+    store.updateTask(editId.value, {
+      title: form.value.title,
+      description: form.value.description || null,
+      columnId: form.value.columnId,
+      priority: form.value.priority,
+      category: form.value.category,
+      dueDate: form.value.dueDate,
+    })
+  } else {
+    store.addTask({
+      title: form.value.title,
+      description: form.value.description || null,
+      columnId: form.value.columnId,
+      priority: form.value.priority,
+      category: form.value.category,
+      dueDate: form.value.dueDate,
+      assignee: null,
+      date: new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' }) + '  ' + new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+      channel: { name: 'GitHub', icon: 'github' },
+      members: [],
+      extraMembers: 0,
+      image: null,
+    })
+  }
+  showModal.value = false
+}
+
+function onDrop({ taskId, colId }) {
+  store.moveTask(taskId, colId)
+}
+</script>
