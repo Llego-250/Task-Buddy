@@ -24,7 +24,7 @@ public class TaskService {
         return taskRepository.findAll().stream().map(TaskResponse::from).toList();
     }
 
-    public TaskResponse getById(Long id) {
+    public TaskResponse getById(String id) {
         return TaskResponse.from(findOrThrow(id));
     }
 
@@ -33,22 +33,22 @@ public class TaskService {
         return TaskResponse.from(taskRepository.save(task));
     }
 
-    public TaskResponse update(Long id, TaskRequest req) {
+    public TaskResponse update(String id, TaskRequest req) {
         Task task = mapToEntity(findOrThrow(id), req);
         return TaskResponse.from(taskRepository.save(task));
     }
 
-    public void delete(Long id) {
+    public void delete(String id) {
         taskRepository.delete(findOrThrow(id));
     }
 
-    public TaskResponse toggleComplete(Long id) {
+    public TaskResponse toggleComplete(String id) {
         Task task = findOrThrow(id);
         task.setCompleted(!task.isCompleted());
         return TaskResponse.from(taskRepository.save(task));
     }
 
-    public TaskResponse updateTimer(Long id, long seconds) {
+    public TaskResponse updateTimer(String id, long seconds) {
         Task task = findOrThrow(id);
         task.setActualSeconds(seconds);
         return TaskResponse.from(taskRepository.save(task));
@@ -78,7 +78,7 @@ public class TaskService {
 
     // ── helpers ──────────────────────────────────────────────────────────────
 
-    private Task findOrThrow(Long id) {
+    private Task findOrThrow(String id) {
         return taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found: " + id));
     }
@@ -91,7 +91,7 @@ public class TaskService {
         task.setDueDate(req.getDueDate());
         task.setEstimatedHours(req.getEstimatedHours());
         if (req.getRecurring() != null) task.setRecurring(req.getRecurring());
-        if (req.getDependencies() != null) task.setDependencies(req.getDependencies());
+    if (req.getDependencies() != null) task.setDependencies(req.getDependencies());
 
         task.getSubtasks().clear();
         if (req.getSubtasks() != null) {

@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 public class TaskResponse {
 
-    private Long id;
+    private String id;
     private String title;
     private String description;
     private Task.Priority priority;
@@ -23,7 +23,7 @@ public class TaskResponse {
     private long actualSeconds;
     private int progress;           // % of completed subtasks
     private RecurringConfig recurring;
-    private List<Long> dependencies;
+    private List<String> dependencies;
     private List<SubtaskResponse> subtasks;
 
     public static TaskResponse from(Task task) {

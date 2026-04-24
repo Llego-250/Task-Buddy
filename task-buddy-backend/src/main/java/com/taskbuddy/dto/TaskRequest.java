@@ -26,7 +26,7 @@ public class TaskRequest {
 
     private RecurringConfig recurring;
 
-    private List<Long> dependencies;
+    private List<String> dependencies;
 
     private List<SubtaskRequest> subtasks;
 }

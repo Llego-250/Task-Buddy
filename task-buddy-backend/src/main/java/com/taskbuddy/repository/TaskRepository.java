@@ -1,13 +1,12 @@
 package com.taskbuddy.repository;
 
 import com.taskbuddy.model.Task;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificationExecutor<Task> {
+public interface TaskRepository extends MongoRepository<Task, String> {
     List<Task> findByCompleted(boolean completed);
     List<Task> findByCategory(String category);
     List<Task> findByPriority(Task.Priority priority);

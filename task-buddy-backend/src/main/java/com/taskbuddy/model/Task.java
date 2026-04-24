@@ -1,30 +1,29 @@
 package com.taskbuddy.model;
 
-import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-@Entity
-@Table(name = "tasks")
+@Document(collection = "tasks")
 @Data
 @NoArgsConstructor
 public class Task {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id = UUID.randomUUID().toString();
 
-    @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Enumerated(EnumType.STRING)
     private Priority priority = Priority.MEDIUM;
 
     private String category;
@@ -39,15 +38,12 @@ public class Task {
 
     private long actualSeconds = 0;
 
-    @Embedded
     private RecurringConfig recurring = new RecurringConfig();
 
-    @ElementCollection
-    @CollectionTable(name = "task_dependencies", joinColumns = @JoinColumn(name = "task_id"))
-    @Column(name = "dependency_id")
-    private List<Long> dependencies = new ArrayList<>();
+    // store dependency ids as strings
+    private List<String> dependencies = new ArrayList<>();
 
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    // store subtasks as embedded documents
     private List<Subtask> subtasks = new ArrayList<>();
 
     public enum Priority { HIGH, MEDIUM, LOW }
