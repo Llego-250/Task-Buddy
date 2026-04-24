@@ -1,0 +1,50 @@
+package com.taskbuddy.service;
+
+import com.taskbuddy.dto.AnalyticsResponse;
+import com.taskbuddy.model.Task;
+import com.taskbuddy.repository.TaskRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class AnalyticsService {
+
+    private final TaskRepository taskRepository;
+
+    public AnalyticsResponse getSummary() {
+        List<Task> all = taskRepository.findAll();
+        long total = all.size();
+        long completed = all.stream().filter(Task::isCompleted).count();
+        long overdue = taskRepository.findByDueDateBeforeAndCompletedFalse(LocalDateTime.now()).size();
+
+        double totalEstimated = all.stream().mapToDouble(Task::getEstimatedHours).sum();
+        double totalActual = all.stream().mapToDouble(t -> t.getActualSeconds() / 3600.0).sum();
+
+        Map<String, Long> byPriority = all.stream()
+                .collect(Collectors.groupingBy(t -> t.getPriority().name(), Collectors.counting()));
+
+        Map<String, Long> byCategory = all.stream()
+                .filter(t -> t.getCategory() != null)
+                .collect(Collectors.groupingBy(Task::getCategory, Collectors.counting()));
+
+        return AnalyticsResponse.builder()
+                .totalTasks(total)
+                .completedTasks(completed)
+                .overdueTasks(overdue)
+                .activeTasks(total - completed - overdue)
+                .completionRate(total == 0 ? 0 : (completed * 100.0 / total))
+                .totalEstimatedHours(totalEstimated)
+                .totalActualHours(totalActual)
+                .byPriority(byPriority)
+                .byCategory(byCategory)
+                .build();
+    }
+}
