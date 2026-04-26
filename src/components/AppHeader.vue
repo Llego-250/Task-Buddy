@@ -31,15 +31,27 @@
       </button>
 
       <!-- Avatar -->
-      <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm cursor-pointer select-none ring-2 ring-transparent hover:ring-green-300 transition-all ml-1">
-        O
+      <div
+        @click="showProfile = true"
+        class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm cursor-pointer select-none ring-2 ring-transparent hover:ring-green-300 transition-all ml-1"
+      >
+        {{ initial }}
       </div>
     </div>
+
+    <ProfilePanel v-if="showProfile" @close="showProfile = false" />
   </header>
 </template>
 
 <script setup>
+import { ref, computed } from 'vue'
 import { useTaskStore } from '../stores/taskStore'
+import { useAuthStore } from '../stores/authStore'
+import ProfilePanel from './ProfilePanel.vue'
+
 defineProps({ title: { type: String, default: 'Tasks' } })
 const store = useTaskStore()
+const authStore = useAuthStore()
+const showProfile = ref(false)
+const initial = computed(() => (authStore.user?.name || 'U')[0].toUpperCase())
 </script>
