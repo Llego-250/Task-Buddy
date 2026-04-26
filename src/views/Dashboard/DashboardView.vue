@@ -181,26 +181,38 @@ const calendarTitle = computed(() =>
     .toLocaleString('default', { month: 'long', year: 'numeric' })
 )
 
-const calendarCells = computed(() => {
-  const byDate = analytics.value?.byDate || {}
-  const maxCount = Math.max(1, ...Object.values(byDate).map(Number))
+const hoveredCell = ref(null)
 
+const calendarCells = computed(() => {
   const year = viewYear.value
   const month = viewMonth.value
-  const firstDay = new Date(year, month, 1).getDay()   // 0=Sun
+  const firstDay = new Date(year, month, 1).getDay()
   const daysInMonth = new Date(year, month + 1, 0).getDate()
   const todayStr = today.toISOString().slice(0, 10)
 
-  const cells = []
+  // Group tasks by their dueDate for this month
+  const byDay = {}
+  store.tasks.forEach(t => {
+    if (!t.dueDate) return
+    const d = t.dueDate.slice(0, 10)
+    if (!d.startsWith(`${year}-${String(month + 1).padStart(2, '0')}`)) return
+    if (!byDay[d]) byDay[d] = []
+    byDay[d].push(t)
+  })
 
-  // Leading empty cells
+  const PRIORITY_ORDER = { High: 0, Medium: 1, Low: 2 }
+
+  const cells = []
   for (let i = 0; i < firstDay; i++) cells.push(null)
 
   for (let d = 1; d <= daysInMonth; d++) {
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
-    const count = byDate[dateStr] || 0
-    const level = count === 0 ? 0 : Math.min(4, Math.ceil((count / maxCount) * 4))
-    cells.push({ day: d, date: dateStr, count, level, isToday: dateStr === todayStr })
+    const tasks = (byDay[dateStr] || []).sort((a, b) =>
+      (PRIORITY_ORDER[a.priority] ?? 3) - (PRIORITY_ORDER[b.priority] ?? 3)
+    )
+    const topPriority = tasks.length ? tasks[0].priority.toLowerCase() : 'none'
+    const isOverdue = dateStr < todayStr && tasks.some(t => !t.completed)
+    cells.push({ day: d, date: dateStr, tasks, topPriority, isOverdue, isToday: dateStr === todayStr })
   }
 
   return cells
