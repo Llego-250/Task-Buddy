@@ -6,7 +6,6 @@ import com.taskbuddy.exception.ResourceNotFoundException;
 import com.taskbuddy.model.Subtask;
 import com.taskbuddy.model.Task;
 import com.taskbuddy.repository.TaskRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,11 +16,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class TaskService {
 
     private final TaskRepository taskRepository;
+
+    public TaskService(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
+    }
 
     public List<TaskResponse> getAll() {
         return taskRepository.findAll().stream().map(TaskResponse::from).toList();

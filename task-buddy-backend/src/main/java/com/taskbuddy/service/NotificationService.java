@@ -6,7 +6,6 @@ import com.taskbuddy.model.Notification;
 import com.taskbuddy.model.Task;
 import com.taskbuddy.repository.NotificationRepository;
 import com.taskbuddy.repository.TaskRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,12 +13,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final TaskRepository taskRepository;
+
+    public NotificationService(NotificationRepository notificationRepository, TaskRepository taskRepository) {
+        this.notificationRepository = notificationRepository;
+        this.taskRepository = taskRepository;
+    }
 
     public Notification create(NotificationRequest req) {
     Task task = taskRepository.findById(req.getTaskId())
