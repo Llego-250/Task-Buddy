@@ -312,13 +312,26 @@ const workloadTasks = computed(() =>
   aspect-ratio: 1;
   border-radius: 4px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: 11px;
   font-weight: 500;
   cursor: default;
-  color: #fff;
   position: relative;
+  background: var(--heat-0, #f1f5f9);
+  color: #555;
+  overflow: visible;
+}
+
+.cal-day-num {
+  line-height: 1;
+}
+
+.cal-dot-row {
+  display: flex;
+  gap: 2px;
+  margin-top: 2px;
 }
 
 .cal-empty {
@@ -326,31 +339,83 @@ const workloadTasks = computed(() =>
 }
 
 .cal-today {
-  outline: 2px solid #196127;
+  outline: 2px solid #2563eb;
   outline-offset: 1px;
 }
 
-.heat-0 { background-color: var(--heat-0, #e8e8e8); color: #555; }
-.heat-1 { background-color: var(--heat-1, #c6e48b); color: #333; }
-.heat-2 { background-color: var(--heat-2, #7bc96f); color: #fff; }
-.heat-3 { background-color: var(--heat-3, #239a3b); color: #fff; }
-.heat-4 { background-color: var(--heat-4, #196127); color: #fff; }
+.cal-overdue {
+  background: #fff1f2 !important;
+  color: #be123c;
+}
+
+/* Cell background by top priority */
+.due-high   { background: #fee2e2; color: #991b1b; }
+.due-medium { background: #fef9c3; color: #854d0e; }
+.due-low    { background: #dcfce7; color: #166534; }
+.due-none   { background: var(--heat-0, #f1f5f9); color: #555; }
+
+/* Priority dots */
+.pdot-high, .pdot-medium, .pdot-low {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+.pdot-high   { background: #dc2626; }
+.pdot-medium { background: #ca8a04; }
+.pdot-low    { background: #16a34a; }
+
+/* Tooltip */
+.cal-tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e293b;
+  color: #f8fafc;
+  border-radius: 6px;
+  padding: 8px 10px;
+  min-width: 160px;
+  max-width: 220px;
+  z-index: 50;
+  font-size: 11px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  pointer-events: none;
+}
+
+.cal-tooltip-date {
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #94a3b8;
+}
+
+.cal-tooltip-task {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 .cal-legend {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   margin-top: 8px;
   font-size: 11px;
   color: var(--text-muted, #888);
 }
 
-.cal-legend i {
+.cal-legend i, .cal-overdue-dot {
   display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
 }
+
+.cal-overdue-dot { background: #fda4af; }
 
 .workload-count {
   font-size: 12px;
