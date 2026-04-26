@@ -32,7 +32,7 @@
       <!-- ── MAIN ── -->
       <main class="p-main">
 
-        <!-- Topbar -->
+        <!-- Topbar — fixed, never scrolls -->
         <div class="p-topbar">
           <div class="p-breadcrumb">
             <span>Home</span>
@@ -45,6 +45,9 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
         </div>
+
+        <!-- Scrollable content -->
+        <div class="p-scroll">
 
         <!-- Profile card -->
         <div class="p-card">
@@ -127,6 +130,7 @@
           <div v-if="!recentTasks.length" class="p-empty">No tasks found.</div>
         </div>
 
+        </div><!-- end p-scroll -->
       </main>
     </div>
   </div>
@@ -332,8 +336,15 @@ function handleLogout() {
 /* ── Main ── */
 .p-main {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.p-scroll {
+  flex: 1;
   overflow-y: auto;
-  padding: 24px 28px;
+  padding: 0 28px 24px;
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -341,6 +352,8 @@ function handleLogout() {
 
 /* Topbar */
 .p-topbar {
+  flex-shrink: 0;
+  padding: 24px 28px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
