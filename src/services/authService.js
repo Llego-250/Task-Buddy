@@ -1,0 +1,25 @@
+const API_BASE = 'http://localhost:8080/api/auth'
+
+export const authAPI = {
+  async register({ name, email, password }) {
+    const res = await fetch(`${API_BASE}/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password }),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message || 'Registration failed')
+    return data
+  },
+
+  async login({ email, password }) {
+    const res = await fetch(`${API_BASE}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message || 'Login failed')
+    return data
+  },
+}
