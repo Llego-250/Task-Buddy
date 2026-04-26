@@ -27,8 +27,8 @@
           <input v-model="form.password" type="password" required class="auth-input auth-input-dark" placeholder="Enter your password" />
 
           <p v-if="error" class="auth-error">{{ error }}</p>
-          <button type="submit" class="auth-button auth-button-purple">
-            Sign in
+          <button type="submit" class="auth-button auth-button-purple" :disabled="loading">
+            {{ loading ? 'Signing in...' : 'Sign in' }}
           </button>
         </form>
       </section>
@@ -44,15 +44,19 @@ import { useAuthStore } from '../../stores/authStore'
 const router = useRouter()
 const auth = useAuthStore()
 const error = ref('')
+const loading = ref(false)
 const form = reactive({ email: '', password: '' })
 
-function submit() {
+async function submit() {
   error.value = ''
+  loading.value = true
   try {
-    auth.login(form)
+    await auth.login(form)
     router.push('/dashboard')
   } catch (e) {
     error.value = e.message
+  } finally {
+    loading.value = false
   }
 }
 </script>

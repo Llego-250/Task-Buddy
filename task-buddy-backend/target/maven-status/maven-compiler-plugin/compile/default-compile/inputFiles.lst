@@ -1,9 +1,15 @@
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\config\CorsConfig.java
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\config\DataSeeder.java
+E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\config\JwtFilter.java
+E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\config\JwtUtil.java
+E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\config\SecurityConfig.java
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\controller\AnalyticsController.java
+E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\controller\AuthController.java
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\controller\NotificationController.java
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\controller\TaskController.java
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\dto\AnalyticsResponse.java
+E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\dto\AuthRequest.java
+E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\dto\AuthResponse.java
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\dto\NotificationRequest.java
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\dto\SubtaskRequest.java
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\dto\SubtaskResponse.java
@@ -15,8 +21,10 @@ E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\model\Noti
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\model\RecurringConfig.java
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\model\Subtask.java
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\model\Task.java
+E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\model\User.java
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\repository\NotificationRepository.java
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\repository\TaskRepository.java
+E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\repository\UserRepository.java
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\service\AnalyticsService.java
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\service\NotificationService.java
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\service\TaskService.java

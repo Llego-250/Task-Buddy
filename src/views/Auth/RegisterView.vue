@@ -37,8 +37,8 @@
           </label>
 
           <p v-if="error" class="auth-error">{{ error }}</p>
-          <button type="submit" class="auth-button auth-button-purple">
-            Create account
+          <button type="submit" class="auth-button auth-button-purple" :disabled="loading">
+            {{ loading ? 'Creating account...' : 'Create account' }}
           </button>
         </form>
 
@@ -61,12 +61,14 @@ import { useAuthStore } from '../../stores/authStore'
 const router = useRouter()
 const auth = useAuthStore()
 const error = ref('')
+const loading = ref(false)
 const form = reactive({ firstName: '', lastName: '', email: '', password: '', acceptTerms: false })
 
-function submit() {
+async function submit() {
   error.value = ''
+  loading.value = true
   try {
-    auth.register({
+    await auth.register({
       name: `${form.firstName} ${form.lastName}`.trim(),
       email: form.email,
       password: form.password,
@@ -74,6 +76,8 @@ function submit() {
     router.push('/dashboard')
   } catch (e) {
     error.value = e.message
+  } finally {
+    loading.value = false
   }
 }
 </script>
