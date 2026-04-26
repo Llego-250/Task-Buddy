@@ -2,7 +2,7 @@
 // Run this script in MongoDB shell or MongoDB Compass
 
 // Switch to taskbuddy database
-use taskbuddy;
+use("Task-buddy");
 
 // Drop existing collections if they exist (for clean setup)
 db.tasks.drop();
