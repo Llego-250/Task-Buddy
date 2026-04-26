@@ -1,53 +1,39 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
+import { authAPI } from '../services/authService'
 
-const AUTH_USER_KEY = 'pt_auth_user'
-const USERS_KEY = 'pt_users'
+const TOKEN_KEY = 'pt_token'
+const USER_KEY = 'pt_auth_user'
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref(JSON.parse(localStorage.getItem(AUTH_USER_KEY) || 'null'))
-  const users = ref(JSON.parse(localStorage.getItem(USERS_KEY) || '[]'))
+  const token = ref(localStorage.getItem(TOKEN_KEY) || null)
+  const user = ref(JSON.parse(localStorage.getItem(USER_KEY) || 'null'))
 
-  const isAuthenticated = computed(() => !!user.value)
+  const isAuthenticated = computed(() => !!token.value)
 
-  function persistUsers() {
-    localStorage.setItem(USERS_KEY, JSON.stringify(users.value))
+  function persist(data) {
+    token.value = data.token
+    user.value = { id: data.id, name: data.name, email: data.email }
+    localStorage.setItem(TOKEN_KEY, data.token)
+    localStorage.setItem(USER_KEY, JSON.stringify(user.value))
   }
 
-  function persistUserSession() {
-    if (user.value) localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user.value))
-    else localStorage.removeItem(AUTH_USER_KEY)
+  async function register(payload) {
+    const data = await authAPI.register(payload)
+    persist(data)
   }
 
-  function register({ name, email, password }) {
-    const normalizedEmail = email.trim().toLowerCase()
-    const exists = users.value.some(u => u.email === normalizedEmail)
-    if (exists) throw new Error('Email already exists')
-
-    const newUser = {
-      id: Date.now(),
-      name: name.trim(),
-      email: normalizedEmail,
-      password,
-    }
-    users.value.push(newUser)
-    persistUsers()
-    user.value = { id: newUser.id, name: newUser.name, email: newUser.email }
-    persistUserSession()
-  }
-
-  function login({ email, password }) {
-    const normalizedEmail = email.trim().toLowerCase()
-    const found = users.value.find(u => u.email === normalizedEmail && u.password === password)
-    if (!found) throw new Error('Invalid email or password')
-    user.value = { id: found.id, name: found.name, email: found.email }
-    persistUserSession()
+  async function login(payload) {
+    const data = await authAPI.login(payload)
+    persist(data)
   }
 
   function logout() {
+    token.value = null
     user.value = null
-    persistUserSession()
+    localStorage.removeItem(TOKEN_KEY)
+    localStorage.removeItem(USER_KEY)
   }
 
-  return { user, isAuthenticated, register, login, logout }
+  return { token, user, isAuthenticated, register, login, logout }
 })
