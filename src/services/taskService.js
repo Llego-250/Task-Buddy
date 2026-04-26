@@ -80,10 +80,7 @@ export const analyticsAPI = {
 }
 
 export const MESSAGES = [
-  { id: 1, name: 'Microsoft Team', icon: 'teams',     badge: 0 },
   { id: 2, name: 'Slack',          icon: 'slack',     badge: 0 },
   { id: 3, name: 'GitHub',         icon: 'github',    badge: 2 },
-  { id: 4, name: 'Messenger',      icon: 'messenger', badge: 0 },
   { id: 5, name: 'Gmail',          icon: 'gmail',     badge: 0 },
-  { id: 6, name: 'Discord',        icon: 'discord',   badge: 0 },
 ]
