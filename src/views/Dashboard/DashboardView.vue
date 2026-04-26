@@ -67,18 +67,41 @@
         <div class="dashboard-card-head">
           <div>
             <h3>Activity</h3>
-            <p>Understand your productive and workload.</p>
+            <p>Tasks created per day — last 12 weeks</p>
           </div>
           <button class="dot-btn">...</button>
         </div>
         <div class="activity-rate">{{ completionRate }}%</div>
-        <div class="activity-grid">
-          <div
-            v-for="(cell, idx) in activityHeatmap"
-            :key="idx"
-            class="activity-cell"
-            :style="{ opacity: cell }"
-          ></div>
+        <div class="heatmap-wrapper">
+          <div class="heatmap-month-labels">
+            <span
+              v-for="m in heatmap.monthLabels"
+              :key="m.label + m.col"
+              :style="{ gridColumnStart: m.col }"
+            >{{ m.label }}</span>
+          </div>
+          <div class="heatmap-body">
+            <div class="heatmap-day-labels">
+              <span></span>
+              <span>Mon</span>
+              <span></span>
+              <span>Wed</span>
+              <span></span>
+              <span>Fri</span>
+              <span></span>
+            </div>
+            <div class="heatmap-grid">
+              <div v-for="(week, wi) in heatmap.weeks" :key="wi" class="heatmap-col">
+                <div
+                  v-for="(day, di) in week"
+                  :key="di"
+                  class="heatmap-cell"
+                  :class="day ? `heat-${day.level}` : 'heat-0'"
+                  :title="day ? `${day.date}: ${day.count} task(s)` : ''"
+                ></div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -125,9 +148,9 @@ onMounted(async () => {
 const total = computed(() => analytics.value?.totalTasks || 1)
 
 const counts = computed(() => ({
-  high: analytics.value?.byPriority?.HIGH || analytics.value?.byPriority?.High || 0,
-  medium: analytics.value?.byPriority?.MEDIUM || analytics.value?.byPriority?.Medium || 0,
-  low: analytics.value?.byPriority?.LOW || analytics.value?.byPriority?.Low || 0,
+  high: analytics.value?.byPriority?.High || analytics.value?.byPriority?.HIGH || 0,
+  medium: analytics.value?.byPriority?.Medium || analytics.value?.byPriority?.MEDIUM || 0,
+  low: analytics.value?.byPriority?.Low || analytics.value?.byPriority?.LOW || 0,
 }))
 
 const completionRate = computed(() => Math.round(analytics.value?.completionRate || 0))
@@ -151,7 +174,58 @@ const metrics = computed(() => [
   { value: analytics.value?.overdueTasks ?? '—', label: 'Overdue Tasks', tone: 'tone-pink' },
 ])
 
-const activityHeatmap = [0.2, 0.35, 0.8, 0.75, 0.5, 0.65, 0.7, 0.28, 0.72, 0.5, 0.76, 0.9, 0.78, 0.82, 0.32, 0.75, 0.81, 0.84, 0.69, 0.88, 0.74, 0.6, 0.78, 0.82, 0.85, 0.3, 0.42, 0.2, 0.67, 0.88, 0.23, 0.91, 0.4, 0.37, 0.53]
+// Build 12-week calendar heatmap from byDate data
+const heatmap = computed(() => {
+  const byDate = analytics.value?.byDate || {}
+  const WEEKS = 12
+  const today = new Date()
+  // Align to end of current week (Saturday)
+  const endDate = new Date(today)
+  endDate.setDate(today.getDate() + (6 - today.getDay()))
+
+  const startDate = new Date(endDate)
+  startDate.setDate(endDate.getDate() - WEEKS * 7 + 1)
+
+  // Find max count for level scaling
+  const maxCount = Math.max(1, ...Object.values(byDate))
+
+  const weeks = []
+  const monthLabels = []
+  let seenMonths = new Set()
+  let colIndex = 1
+
+  const cursor = new Date(startDate)
+  // Align cursor to Sunday (start of week)
+  cursor.setDate(cursor.getDate() - cursor.getDay())
+
+  for (let w = 0; w < WEEKS; w++) {
+    const week = []
+    for (let d = 0; d < 7; d++) {
+      const dateStr = cursor.toISOString().slice(0, 10)
+      const count = byDate[dateStr] || 0
+      const inRange = cursor >= startDate && cursor <= endDate
+      const level = !inRange || count === 0 ? 0 : Math.ceil((count / maxCount) * 4)
+
+      // Track month label for first occurrence of each month
+      const monthKey = `${cursor.getFullYear()}-${cursor.getMonth()}`
+      if (inRange && d === 0 && !seenMonths.has(monthKey)) {
+        seenMonths.add(monthKey)
+        monthLabels.push({
+          label: cursor.toLocaleString('default', { month: 'short' }),
+          col: colIndex,
+        })
+      }
+
+      week.push(inRange ? { date: dateStr, count, level } : null)
+      cursor.setDate(cursor.getDate() + 1)
+    }
+    weeks.push(week)
+    colIndex++
+  }
+
+  return { weeks, monthLabels }
+})
+
 const embers = [
   { name: 'Mark Chen', role: 'Product Manager', active: 12, overdue: 5, state: 'On Track', stateClass: 'state-red' },
   { name: 'Emily Davis', role: 'UX Researcher', active: 10, overdue: 2, state: 'Under Pressure', stateClass: 'state-green' },
@@ -160,3 +234,62 @@ const embers = [
   { name: 'Michael Brown', role: 'QA Specialist', active: 20, overdue: 6, state: 'Balanced', stateClass: 'state-green' },
 ]
 </script>
+
+<style scoped>
+.heatmap-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-x: auto;
+  padding-top: 4px;
+}
+
+.heatmap-month-labels {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  padding-left: 28px;
+  font-size: 11px;
+  color: var(--text-muted, #888);
+}
+
+.heatmap-body {
+  display: flex;
+  gap: 4px;
+}
+
+.heatmap-day-labels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-muted, #888);
+  padding-bottom: 2px;
+  min-width: 24px;
+  text-align: right;
+  padding-right: 4px;
+}
+
+.heatmap-grid {
+  display: flex;
+  gap: 3px;
+}
+
+.heatmap-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.heatmap-cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  cursor: default;
+}
+
+.heat-0 { background-color: var(--heat-0, #e8e8e8); }
+.heat-1 { background-color: var(--heat-1, #c6e48b); }
+.heat-2 { background-color: var(--heat-2, #7bc96f); }
+.heat-3 { background-color: var(--heat-3, #239a3b); }
+.heat-4 { background-color: var(--heat-4, #196127); }
+</style>
