@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tasks")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class TaskController {
 
     private final TaskService taskService;
@@ -23,6 +25,11 @@ public class TaskController {
     @GetMapping
     public List<TaskResponse> getAll() {
         return taskService.getAll();
+    }
+
+    @GetMapping("/kanban")
+    public Map<String, List<TaskResponse>> getKanbanTasks() {
+        return taskService.getTasksByColumn();
     }
 
     @GetMapping("/{id}")
@@ -39,6 +46,11 @@ public class TaskController {
     @PutMapping("/{id}")
     public TaskResponse update(@PathVariable String id, @Valid @RequestBody TaskRequest req) {
         return taskService.update(id, req);
+    }
+
+    @PatchMapping("/{id}/move")
+    public TaskResponse moveTask(@PathVariable String id, @RequestParam String columnId) {
+        return taskService.moveTask(id, columnId);
     }
 
     @DeleteMapping("/{id}")
@@ -66,10 +78,11 @@ public class TaskController {
     public List<TaskResponse> filter(
             @RequestParam(required = false) String category,
             @RequestParam(required = false) Task.Priority priority,
+            @RequestParam(required = false) String columnId,
             @RequestParam(required = false) Boolean completed,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to) {
-        return taskService.filter(category, priority, completed, from, to);
+        return taskService.filter(category, priority, columnId, completed, from, to);
     }
 
     @GetMapping("/overdue")
