@@ -107,39 +107,48 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
-import { useTaskStore } from '../../stores/taskStore'
+import { computed, ref, onMounted } from 'vue'
+import { analyticsAPI } from '../../services/taskService'
 
-const store = useTaskStore()
 const search = ref('')
 const userName = 'Be'
-const total = computed(() => store.tasks.length || 1)
-const doneCount = computed(() => store.tasksByColumn.done?.length || 0)
-const inProgressCount = computed(() => store.tasksByColumn.inprogress?.length || 0)
-const overdueCount = computed(() => store.tasksByColumn.todo?.length || 0)
+const analytics = ref(null)
 
-const completionRate = computed(() => Math.round((doneCount.value / total.value) * 100))
-
-const counts = computed(() => {
-  const base = { high: 0, medium: 0, low: 0 }
-  store.tasks.forEach((task) => {
-    const key = (task.priority || '').toLowerCase()
-    if (key in base) base[key] += 1
-  })
-  return base
+onMounted(async () => {
+  try {
+    analytics.value = await analyticsAPI.getSummary()
+  } catch (e) {
+    console.error('Failed to load analytics:', e)
+  }
 })
 
-const statusRates = computed(() => ({
-  inProgress: Math.round((inProgressCount.value / total.value) * 100),
-  completed: Math.round((doneCount.value / total.value) * 100),
-  overdue: Math.round((overdueCount.value / total.value) * 100),
+const total = computed(() => analytics.value?.totalTasks || 1)
+
+const counts = computed(() => ({
+  high: analytics.value?.byPriority?.HIGH || analytics.value?.byPriority?.High || 0,
+  medium: analytics.value?.byPriority?.MEDIUM || analytics.value?.byPriority?.Medium || 0,
+  low: analytics.value?.byPriority?.LOW || analytics.value?.byPriority?.Low || 0,
 }))
 
+const completionRate = computed(() => Math.round(analytics.value?.completionRate || 0))
+
+const statusRates = computed(() => {
+  const t = total.value
+  const completed = analytics.value?.completedTasks || 0
+  const overdue = analytics.value?.overdueTasks || 0
+  const active = analytics.value?.activeTasks || 0
+  return {
+    inProgress: Math.round((active / t) * 100),
+    completed: Math.round((completed / t) * 100),
+    overdue: Math.round((overdue / t) * 100),
+  }
+})
+
 const metrics = computed(() => [
-  { value: 156, label: 'Active Projects', tone: 'tone-blue' },
-  { value: '82%', label: 'Utilization Rate', tone: 'tone-indigo' },
-  { value: '2.4 Days', label: 'Average Time', tone: 'tone-green' },
-  { value: 3, label: 'At Risk Projects', tone: 'tone-pink' },
+  { value: analytics.value?.activeTasks ?? '—', label: 'Active Tasks', tone: 'tone-blue' },
+  { value: completionRate.value + '%', label: 'Completion Rate', tone: 'tone-indigo' },
+  { value: analytics.value?.totalTasks ?? '—', label: 'Total Tasks', tone: 'tone-green' },
+  { value: analytics.value?.overdueTasks ?? '—', label: 'Overdue Tasks', tone: 'tone-pink' },
 ])
 
 const activityHeatmap = [0.2, 0.35, 0.8, 0.75, 0.5, 0.65, 0.7, 0.28, 0.72, 0.5, 0.76, 0.9, 0.78, 0.82, 0.32, 0.75, 0.81, 0.84, 0.69, 0.88, 0.74, 0.6, 0.78, 0.82, 0.85, 0.3, 0.42, 0.2, 0.67, 0.88, 0.23, 0.91, 0.4, 0.37, 0.53]
