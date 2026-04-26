@@ -5,7 +5,6 @@ import com.taskbuddy.model.Task;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -16,13 +15,29 @@ public class TaskRequest {
 
     private String description;
 
-    private Task.Priority priority = Task.Priority.MEDIUM;
+    private Task.Priority priority = Task.Priority.Medium;
 
     private String category;
 
-    private LocalDateTime dueDate;
+    private String columnId = "todo";
+
+    private String dueDate;
 
     private double estimatedHours;
+
+    private String assigneeName;
+
+    private String assigneeAvatar;
+
+    private String channelName;
+
+    private String channelIcon;
+
+    private List<String> memberAvatars;
+
+    private int extraMembers;
+
+    private String image;
 
     private RecurringConfig recurring;
 

@@ -4,12 +4,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
- 
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Document(collection = "tasks")
 @Data
@@ -17,17 +15,21 @@ import java.util.UUID;
 public class Task {
 
     @Id
-    private String id = UUID.randomUUID().toString();
+    private String id;
 
     private String title;
 
     private String description;
 
-    private Priority priority = Priority.MEDIUM;
+    private Priority priority = Priority.Medium;
 
     private String category;
 
-    private LocalDateTime dueDate;
+    private String columnId = "todo";
+
+    private String dueDate; // Frontend uses string format
+
+    private String date; // Frontend creation date format
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -37,13 +39,27 @@ public class Task {
 
     private long actualSeconds = 0;
 
+    private String assigneeName;
+
+    private String assigneeAvatar;
+
+    private String channelName;
+
+    private String channelIcon;
+
+    private List<String> memberAvatars = new ArrayList<>();
+
+    private int extraMembers = 0;
+
+    private String image;
+
     private RecurringConfig recurring = new RecurringConfig();
 
-    // store dependency ids as strings
     private List<String> dependencies = new ArrayList<>();
 
-    // store subtasks as embedded documents
     private List<Subtask> subtasks = new ArrayList<>();
 
-    public enum Priority { HIGH, MEDIUM, LOW }
+    public enum Priority { High, Medium, Low }
+
+    public enum Column { todo, inprogress, inreview, done }
 }

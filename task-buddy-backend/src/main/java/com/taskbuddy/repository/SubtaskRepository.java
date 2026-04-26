@@ -1,10 +1,10 @@
 package com.taskbuddy.repository;
 
 import com.taskbuddy.model.Subtask;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-public interface SubtaskRepository extends JpaRepository<Subtask, Long> {
-    List<Subtask> findByTaskId(Long taskId);
+public interface SubtaskRepository extends MongoRepository<Subtask, String> {
+    List<Subtask> findByTaskId(String taskId);
 }
