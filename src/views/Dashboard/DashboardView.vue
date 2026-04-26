@@ -65,43 +65,37 @@
 
       <section class="dashboard-card">
         <div class="dashboard-card-head">
-          <div>
-            <h3>Activity</h3>
-            <p>Tasks created per day — last 12 weeks</p>
+          <div class="cal-nav">
+            <button class="cal-arrow" @click="prevMonth">&#8249;</button>
+            <div>
+              <h3>Activity</h3>
+              <p>{{ calendarTitle }}</p>
+            </div>
+            <button class="cal-arrow" @click="nextMonth" :disabled="isCurrentMonth">&#8250;</button>
           </div>
-          <button class="dot-btn">...</button>
+          <div class="activity-rate">{{ completionRate }}%</div>
         </div>
-        <div class="activity-rate">{{ completionRate }}%</div>
-        <div class="heatmap-wrapper">
-          <div class="heatmap-month-labels">
-            <span
-              v-for="m in heatmap.monthLabels"
-              :key="m.label + m.col"
-              :style="{ gridColumnStart: m.col }"
-            >{{ m.label }}</span>
+
+        <div class="cal-grid">
+          <span class="cal-dow" v-for="d in ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']" :key="d">{{ d }}</span>
+          <div
+            v-for="(cell, i) in calendarCells"
+            :key="i"
+            class="cal-cell"
+            :class="[
+              cell ? `heat-${cell.level}` : 'cal-empty',
+              cell?.isToday ? 'cal-today' : ''
+            ]"
+            :title="cell ? `${cell.date}: ${cell.count} task(s)` : ''"
+          >
+            <span v-if="cell">{{ cell.day }}</span>
           </div>
-          <div class="heatmap-body">
-            <div class="heatmap-day-labels">
-              <span></span>
-              <span>Mon</span>
-              <span></span>
-              <span>Wed</span>
-              <span></span>
-              <span>Fri</span>
-              <span></span>
-            </div>
-            <div class="heatmap-grid">
-              <div v-for="(week, wi) in heatmap.weeks" :key="wi" class="heatmap-col">
-                <div
-                  v-for="(day, di) in week"
-                  :key="di"
-                  class="heatmap-cell"
-                  :class="day ? `heat-${day.level}` : 'heat-0'"
-                  :title="day ? `${day.date}: ${day.count} task(s)` : ''"
-                ></div>
-              </div>
-            </div>
-          </div>
+        </div>
+
+        <div class="cal-legend">
+          <span>Less</span>
+          <i class="heat-0"></i><i class="heat-1"></i><i class="heat-2"></i><i class="heat-3"></i><i class="heat-4"></i>
+          <span>More</span>
         </div>
       </section>
 
@@ -137,12 +131,61 @@ const search = ref('')
 const userName = 'Be'
 const analytics = ref(null)
 
+const today = new Date()
+const viewYear = ref(today.getFullYear())
+const viewMonth = ref(today.getMonth()) // 0-indexed
+
 onMounted(async () => {
   try {
     analytics.value = await analyticsAPI.getSummary()
   } catch (e) {
     console.error('Failed to load analytics:', e)
   }
+})
+
+function prevMonth() {
+  if (viewMonth.value === 0) { viewMonth.value = 11; viewYear.value-- }
+  else viewMonth.value--
+}
+
+function nextMonth() {
+  if (isCurrentMonth.value) return
+  if (viewMonth.value === 11) { viewMonth.value = 0; viewYear.value++ }
+  else viewMonth.value++
+}
+
+const isCurrentMonth = computed(() =>
+  viewYear.value === today.getFullYear() && viewMonth.value === today.getMonth()
+)
+
+const calendarTitle = computed(() =>
+  new Date(viewYear.value, viewMonth.value, 1)
+    .toLocaleString('default', { month: 'long', year: 'numeric' })
+)
+
+const calendarCells = computed(() => {
+  const byDate = analytics.value?.byDate || {}
+  const maxCount = Math.max(1, ...Object.values(byDate).map(Number))
+
+  const year = viewYear.value
+  const month = viewMonth.value
+  const firstDay = new Date(year, month, 1).getDay()   // 0=Sun
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+  const todayStr = today.toISOString().slice(0, 10)
+
+  const cells = []
+
+  // Leading empty cells
+  for (let i = 0; i < firstDay; i++) cells.push(null)
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+    const count = byDate[dateStr] || 0
+    const level = count === 0 ? 0 : Math.min(4, Math.ceil((count / maxCount) * 4))
+    cells.push({ day: d, date: dateStr, count, level, isToday: dateStr === todayStr })
+  }
+
+  return cells
 })
 
 const total = computed(() => analytics.value?.totalTasks || 1)
@@ -174,58 +217,6 @@ const metrics = computed(() => [
   { value: analytics.value?.overdueTasks ?? '—', label: 'Overdue Tasks', tone: 'tone-pink' },
 ])
 
-// Build 12-week calendar heatmap from byDate data
-const heatmap = computed(() => {
-  const byDate = analytics.value?.byDate || {}
-  const WEEKS = 12
-  const today = new Date()
-  // Align to end of current week (Saturday)
-  const endDate = new Date(today)
-  endDate.setDate(today.getDate() + (6 - today.getDay()))
-
-  const startDate = new Date(endDate)
-  startDate.setDate(endDate.getDate() - WEEKS * 7 + 1)
-
-  // Find max count for level scaling
-  const maxCount = Math.max(1, ...Object.values(byDate))
-
-  const weeks = []
-  const monthLabels = []
-  let seenMonths = new Set()
-  let colIndex = 1
-
-  const cursor = new Date(startDate)
-  // Align cursor to Sunday (start of week)
-  cursor.setDate(cursor.getDate() - cursor.getDay())
-
-  for (let w = 0; w < WEEKS; w++) {
-    const week = []
-    for (let d = 0; d < 7; d++) {
-      const dateStr = cursor.toISOString().slice(0, 10)
-      const count = byDate[dateStr] || 0
-      const inRange = cursor >= startDate && cursor <= endDate
-      const level = !inRange || count === 0 ? 0 : Math.ceil((count / maxCount) * 4)
-
-      // Track month label for first occurrence of each month
-      const monthKey = `${cursor.getFullYear()}-${cursor.getMonth()}`
-      if (inRange && d === 0 && !seenMonths.has(monthKey)) {
-        seenMonths.add(monthKey)
-        monthLabels.push({
-          label: cursor.toLocaleString('default', { month: 'short' }),
-          col: colIndex,
-        })
-      }
-
-      week.push(inRange ? { date: dateStr, count, level } : null)
-      cursor.setDate(cursor.getDate() + 1)
-    }
-    weeks.push(week)
-    colIndex++
-  }
-
-  return { weeks, monthLabels }
-})
-
 const embers = [
   { name: 'Mark Chen', role: 'Product Manager', active: 12, overdue: 5, state: 'On Track', stateClass: 'state-red' },
   { name: 'Emily Davis', role: 'UX Researcher', active: 10, overdue: 2, state: 'Under Pressure', stateClass: 'state-green' },
@@ -236,60 +227,92 @@ const embers = [
 </script>
 
 <style scoped>
-.heatmap-wrapper {
+.cal-nav {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  overflow-x: auto;
-  padding-top: 4px;
+  align-items: center;
+  gap: 8px;
 }
 
-.heatmap-month-labels {
+.cal-arrow {
+  background: none;
+  border: 1px solid var(--border, #ddd);
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text, #333);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cal-arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.activity-rate {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 4px 0 8px;
+}
+
+.cal-grid {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  padding-left: 28px;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.cal-dow {
+  font-size: 10px;
+  text-align: center;
+  color: var(--text-muted, #888);
+  padding-bottom: 2px;
+}
+
+.cal-cell {
+  aspect-ratio: 1;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: default;
+  color: #fff;
+  position: relative;
+}
+
+.cal-empty {
+  background: transparent;
+}
+
+.cal-today {
+  outline: 2px solid #196127;
+  outline-offset: 1px;
+}
+
+.heat-0 { background-color: var(--heat-0, #e8e8e8); color: #555; }
+.heat-1 { background-color: var(--heat-1, #c6e48b); color: #333; }
+.heat-2 { background-color: var(--heat-2, #7bc96f); color: #fff; }
+.heat-3 { background-color: var(--heat-3, #239a3b); color: #fff; }
+.heat-4 { background-color: var(--heat-4, #196127); color: #fff; }
+
+.cal-legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
   font-size: 11px;
   color: var(--text-muted, #888);
 }
 
-.heatmap-body {
-  display: flex;
-  gap: 4px;
-}
-
-.heatmap-day-labels {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  font-size: 10px;
-  color: var(--text-muted, #888);
-  padding-bottom: 2px;
-  min-width: 24px;
-  text-align: right;
-  padding-right: 4px;
-}
-
-.heatmap-grid {
-  display: flex;
-  gap: 3px;
-}
-
-.heatmap-col {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.heatmap-cell {
+.cal-legend i {
+  display: inline-block;
   width: 12px;
   height: 12px;
   border-radius: 2px;
-  cursor: default;
 }
-
-.heat-0 { background-color: var(--heat-0, #e8e8e8); }
-.heat-1 { background-color: var(--heat-1, #c6e48b); }
-.heat-2 { background-color: var(--heat-2, #7bc96f); }
-.heat-3 { background-color: var(--heat-3, #239a3b); }
-.heat-4 { background-color: var(--heat-4, #196127); }
 </style>
