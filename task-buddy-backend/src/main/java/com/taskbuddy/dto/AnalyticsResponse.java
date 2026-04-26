@@ -12,6 +12,7 @@ public class AnalyticsResponse {
     private double totalActualHours;
     private Map<String, Long> byPriority;
     private Map<String, Long> byCategory;
+    private Map<String, Long> byDate;
 
     private AnalyticsResponse() {}
 
@@ -28,6 +29,7 @@ public class AnalyticsResponse {
         public Builder totalActualHours(double v) { r.totalActualHours = v; return this; }
         public Builder byPriority(Map<String, Long> v) { r.byPriority = v; return this; }
         public Builder byCategory(Map<String, Long> v) { r.byCategory = v; return this; }
+        public Builder byDate(Map<String, Long> v) { r.byDate = v; return this; }
         public AnalyticsResponse build() { return r; }
     }
 
@@ -40,4 +42,5 @@ public class AnalyticsResponse {
     public double getTotalActualHours() { return totalActualHours; }
     public Map<String, Long> getByPriority() { return byPriority; }
     public Map<String, Long> getByCategory() { return byCategory; }
+    public Map<String, Long> getByDate() { return byDate; }
 }
