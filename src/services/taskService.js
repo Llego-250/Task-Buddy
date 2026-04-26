@@ -63,6 +63,13 @@ export const taskAPI = {
   }
 }
 
+export const analyticsAPI = {
+  async getSummary() {
+    const response = await fetch(`${API_BASE}/analytics/summary`)
+    return response.json()
+  }
+}
+
 export const INITIAL_TASKS = [
   {
     id: 1, columnId: 'todo',
