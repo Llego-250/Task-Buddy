@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { INITIAL_TASKS, COLUMNS, taskAPI } from '../services/taskService'
+import { COLUMNS, taskAPI } from '../services/taskService'
 
 export const useTaskStore = defineStore('task', () => {
   const normalizeTask = (task) => ({
@@ -20,6 +20,7 @@ export const useTaskStore = defineStore('task', () => {
   const filterPriority = ref('')
   const filterCategory = ref('')
   const loading = ref(false)
+  const serverError = ref(false)
 
   const tasksByColumn = computed(() => {
     const q = searchQuery.value.toLowerCase()
@@ -56,12 +57,12 @@ export const useTaskStore = defineStore('task', () => {
   async function loadTasks() {
     try {
       loading.value = true
+      serverError.value = false
       const data = await taskAPI.getAll()
       tasks.value = data.map(normalizeTask)
     } catch (error) {
-      console.error('Failed to load tasks:', error)
-      // Fallback to initial tasks if API fails
-      tasks.value = INITIAL_TASKS.map(normalizeTask)
+      console.warn('Server unavailable:', error.message)
+      serverError.value = true
     } finally {
       loading.value = false
     }
@@ -139,7 +140,7 @@ export const useTaskStore = defineStore('task', () => {
   loadTasks()
 
   return {
-    tasks, darkMode, activeView, loading,
+    tasks, darkMode, activeView, loading, serverError,
     searchQuery, filterPriority, filterCategory,
     tasksByColumn, allFiltered,
     loadTasks, addTask, updateTask, moveTask, deleteTask, toggleDark,

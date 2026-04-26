@@ -1,6 +1,8 @@
 <template>
   <div class="flex flex-col h-full" :class="store.darkMode ? 'bg-gray-900' : 'bg-[#f6f7fb]'">
+    <ServerDown v-if="store.serverError" />
 
+    <template v-else>
     <!-- Sub-header -->
     <div class="flex items-center justify-between px-8 pt-4 pb-3 border-b shrink-0 flex-wrap gap-3 transition-colors" :class="store.darkMode ? 'bg-gray-900 border-gray-800' : 'bg-[#f6f7fb] border-gray-200'">
       <!-- View Tabs -->
@@ -171,6 +173,7 @@
         </div>
       </div>
     </div>
+    </template>
   </div>
 </template>
 
@@ -179,6 +182,7 @@ import { ref, h } from 'vue'
 import { useTaskStore } from '../../stores/taskStore'
 import { COLUMNS, PRIORITIES, CATEGORIES } from '../../services/taskService'
 import KanbanColumn from '../../components/KanbanColumn.vue'
+import ServerDown from '../../components/ServerDown.vue'
 
 const store = useTaskStore()
 const activeTab = ref('table')

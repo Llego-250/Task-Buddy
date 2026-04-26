@@ -1,5 +1,8 @@
 <template>
   <div class="dashboard-page p-4 md:p-5">
+    <ServerDown v-if="store.serverError" />
+
+    <template v-else>
     <div class="dashboard-topbar">
       <div>
         <h2 class="dashboard-welcome">Welcome back, {{ userName }}! 👋</h2>
@@ -135,6 +138,7 @@
         </div>
       </section>
     </div>
+    </template>
   </div>
 </template>
 
@@ -142,6 +146,7 @@
 import { computed, ref, onMounted } from 'vue'
 import { analyticsAPI } from '../../services/taskService'
 import { useTaskStore } from '../../stores/taskStore'
+import ServerDown from '../../components/ServerDown.vue'
 
 const store = useTaskStore()
 
