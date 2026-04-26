@@ -2,7 +2,6 @@ com\taskbuddy\dto\TaskRequest.class
 com\taskbuddy\service\AnalyticsService.class
 com\taskbuddy\exception\ResourceNotFoundException.class
 com\taskbuddy\repository\NotificationRepository.class
-com\taskbuddy\repository\SubtaskRepository.class
 com\taskbuddy\model\RecurringConfig.class
 com\taskbuddy\dto\NotificationRequest.class
 com\taskbuddy\dto\TaskResponse.class

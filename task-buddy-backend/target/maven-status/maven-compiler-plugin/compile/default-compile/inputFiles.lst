@@ -16,7 +16,6 @@ E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\model\Recu
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\model\Subtask.java
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\model\Task.java
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\repository\NotificationRepository.java
-E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\repository\SubtaskRepository.java
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\repository\TaskRepository.java
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\service\AnalyticsService.java
 E:\Projects\Task-Buddy\task-buddy-backend\src\main\java\com\taskbuddy\service\NotificationService.java
