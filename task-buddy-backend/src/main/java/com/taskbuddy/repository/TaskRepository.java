@@ -8,8 +8,10 @@ import java.util.List;
 
 public interface TaskRepository extends MongoRepository<Task, String> {
     List<Task> findByCompleted(boolean completed);
+    List<Task> findByCompletedFalse();
     List<Task> findByCategory(String category);
     List<Task> findByPriority(Task.Priority priority);
+    List<Task> findByColumnId(String columnId);
     List<Task> findByDueDateBetween(LocalDateTime start, LocalDateTime end);
     List<Task> findByDueDateBeforeAndCompletedFalse(LocalDateTime date);
     List<Task> findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String title, String description);
