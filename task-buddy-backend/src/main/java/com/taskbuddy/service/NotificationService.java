@@ -44,15 +44,10 @@ public class NotificationService {
         Notification n = notificationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Notification not found: " + id));
         n.setRead(true);
-        return notification_repository_save(n);
+        return notificationRepository.save(n);
     }
 
     public void delete(String id) {
         notificationRepository.deleteById(id);
-    }
-
-    // helper to avoid potential name clashes when editing
-    private Notification notification_repository_save(Notification n) {
-        return notificationRepository.save(n);
     }
 }
