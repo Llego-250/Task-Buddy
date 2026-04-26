@@ -83,19 +83,34 @@
             :key="i"
             class="cal-cell"
             :class="[
-              cell ? `heat-${cell.level}` : 'cal-empty',
-              cell?.isToday ? 'cal-today' : ''
+              cell ? `due-${cell.topPriority}` : 'cal-empty',
+              cell?.isToday ? 'cal-today' : '',
+              cell?.isOverdue ? 'cal-overdue' : ''
             ]"
-            :title="cell ? `${cell.date}: ${cell.count} task(s)` : ''"
+            @mouseenter="hoveredCell = cell"
+            @mouseleave="hoveredCell = null"
           >
-            <span v-if="cell">{{ cell.day }}</span>
+            <span v-if="cell" class="cal-day-num">{{ cell.day }}</span>
+            <span v-if="cell?.tasks.length" class="cal-dot-row">
+              <i v-for="t in cell.tasks.slice(0, 3)" :key="t.id" :class="`pdot-${t.priority.toLowerCase()}`"></i>
+            </span>
+
+            <!-- Tooltip -->
+            <div v-if="hoveredCell === cell && cell?.tasks.length" class="cal-tooltip">
+              <p class="cal-tooltip-date">{{ cell.date }}</p>
+              <div v-for="t in cell.tasks" :key="t.id" class="cal-tooltip-task">
+                <em :class="`pdot-${t.priority.toLowerCase()}`"></em>
+                <span>{{ t.title }}</span>
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="cal-legend">
-          <span>Less</span>
-          <i class="heat-0"></i><i class="heat-1"></i><i class="heat-2"></i><i class="heat-3"></i><i class="heat-4"></i>
-          <span>More</span>
+          <i class="pdot-high"></i><span>High</span>
+          <i class="pdot-medium"></i><span>Medium</span>
+          <i class="pdot-low"></i><span>Low</span>
+          <i class="cal-overdue-dot"></i><span>Overdue</span>
         </div>
       </section>
 
