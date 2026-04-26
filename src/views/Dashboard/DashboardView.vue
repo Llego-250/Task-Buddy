@@ -104,19 +104,19 @@
           <div>
             <h3>Workload</h3>
           </div>
-          <a href="#" @click.prevent>See All</a>
+          <span class="workload-count">{{ workloadTasks.length }} tasks</span>
         </div>
         <div class="workload-table">
           <div class="workload-row head">
-            <span>Name</span><span>Active work</span><span>Overdue</span><span>Status</span><span>Action</span>
+            <span>Task</span><span>Assignee</span><span>Priority</span><span>Status</span>
           </div>
-          <div class="workload-row" v-for="person in embers" :key="person.name">
-            <span class="name">{{ person.name }}<small>{{ person.role }}</small></span>
-            <span>{{ person.active }}</span>
-            <span>{{ person.overdue }}</span>
-            <span><em :class="person.stateClass">{{ person.state }}</em></span>
-            <span>...</span>
+          <div class="workload-row" v-for="task in workloadTasks" :key="task.id">
+            <span class="name">{{ task.title }}<small>{{ task.category }}</small></span>
+            <span>{{ task.assigneeName || '—' }}</span>
+            <span><em :class="`priority-${(task.priority || '').toLowerCase()}`">{{ task.priority }}</em></span>
+            <span><em :class="`col-${task.columnId}`">{{ columnLabel(task.columnId) }}</em></span>
           </div>
+          <div v-if="!workloadTasks.length" class="workload-empty">No tasks found.</div>
         </div>
       </section>
     </div>
@@ -126,6 +126,9 @@
 <script setup>
 import { computed, ref, onMounted } from 'vue'
 import { analyticsAPI } from '../../services/taskService'
+import { useTaskStore } from '../../stores/taskStore'
+
+const store = useTaskStore()
 
 const search = ref('')
 const userName = 'Be'
@@ -217,13 +220,19 @@ const metrics = computed(() => [
   { value: analytics.value?.overdueTasks ?? '—', label: 'Overdue Tasks', tone: 'tone-pink' },
 ])
 
-const embers = [
-  { name: 'Mark Chen', role: 'Product Manager', active: 12, overdue: 5, state: 'On Track', stateClass: 'state-red' },
-  { name: 'Emily Davis', role: 'UX Researcher', active: 10, overdue: 2, state: 'Under Pressure', stateClass: 'state-green' },
-  { name: 'John Smith', role: 'Frontend Developer', active: 15, overdue: 4, state: 'Sustained', stateClass: 'state-green' },
-  { name: 'Linda Johnson', role: 'Backend Developer', active: 9, overdue: 1, state: 'Overloaded', stateClass: 'state-red' },
-  { name: 'Michael Brown', role: 'QA Specialist', active: 20, overdue: 6, state: 'Balanced', stateClass: 'state-green' },
-]
+const COLUMN_LABELS = {
+  todo: 'To Do',
+  inprogress: 'In Progress',
+  inreview: 'In Review',
+  done: 'Done',
+}
+function columnLabel(id) { return COLUMN_LABELS[id] || id }
+
+const workloadTasks = computed(() =>
+  store.tasks
+    .filter(t => t.columnId !== 'done')
+    .slice(0, 10)
+)
 </script>
 
 <style scoped>
@@ -315,4 +324,33 @@ const embers = [
   height: 12px;
   border-radius: 2px;
 }
+
+.workload-count {
+  font-size: 12px;
+  color: var(--text-muted, #888);
+}
+
+.workload-empty {
+  padding: 12px 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted, #888);
+}
+
+.workload-row em {
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.priority-high   { background: #fee2e2; color: #dc2626; }
+.priority-medium { background: #fef9c3; color: #ca8a04; }
+.priority-low    { background: #dcfce7; color: #16a34a; }
+
+.col-todo       { background: #f1f5f9; color: #64748b; }
+.col-inprogress { background: #dbeafe; color: #2563eb; }
+.col-inreview   { background: #ffedd5; color: #ea580c; }
+.col-done       { background: #dcfce7; color: #16a34a; }
 </style>
