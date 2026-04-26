@@ -2,7 +2,6 @@ package com.taskbuddy.config;
 
 import com.taskbuddy.model.Task;
 import com.taskbuddy.repository.TaskRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -10,10 +9,13 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 public class DataSeeder implements CommandLineRunner {
 
     private final TaskRepository taskRepository;
+
+    public DataSeeder(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
+    }
 
     @Override
     public void run(String... args) {
