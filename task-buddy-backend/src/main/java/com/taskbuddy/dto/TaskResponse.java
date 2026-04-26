@@ -15,12 +15,21 @@ public class TaskResponse {
     private String description;
     private Task.Priority priority;
     private String category;
-    private LocalDateTime dueDate;
+    private String columnId;
+    private String dueDate;
+    private String date;
     private LocalDateTime createdAt;
     private boolean completed;
     private double estimatedHours;
     private long actualSeconds;
-    private int progress;           // % of completed subtasks
+    private int progress;
+    private String assigneeName;
+    private String assigneeAvatar;
+    private String channelName;
+    private String channelIcon;
+    private List<String> memberAvatars;
+    private int extraMembers;
+    private String image;
     private RecurringConfig recurring;
     private List<String> dependencies;
     private List<SubtaskResponse> subtasks;
@@ -32,11 +41,20 @@ public class TaskResponse {
         r.setDescription(task.getDescription());
         r.setPriority(task.getPriority());
         r.setCategory(task.getCategory());
+        r.setColumnId(task.getColumnId());
         r.setDueDate(task.getDueDate());
+        r.setDate(task.getDate());
         r.setCreatedAt(task.getCreatedAt());
         r.setCompleted(task.isCompleted());
         r.setEstimatedHours(task.getEstimatedHours());
         r.setActualSeconds(task.getActualSeconds());
+        r.setAssigneeName(task.getAssigneeName());
+        r.setAssigneeAvatar(task.getAssigneeAvatar());
+        r.setChannelName(task.getChannelName());
+        r.setChannelIcon(task.getChannelIcon());
+        r.setMemberAvatars(task.getMemberAvatars());
+        r.setExtraMembers(task.getExtraMembers());
+        r.setImage(task.getImage());
         r.setRecurring(task.getRecurring());
         r.setDependencies(task.getDependencies());
 
